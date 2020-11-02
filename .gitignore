@@ -1,8 +1,6 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 
-# Ignore templates for now. We're not really using them
-templates/
 
 # Files that could contain secrets
 sql_learn.py

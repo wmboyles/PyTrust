@@ -1,0 +1,28 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="layout :: head(title=~{::title},links=~{})">
+<title>Fill Prescriptions</title>
+</head>
+<body th:include="layout :: body" th:with="content=~{::content}">
+
+
+	<div th:fragment="content">
+		<script th:inline="javascript">
+	    /* Otherwise Thymeleaf tries to parse Javascript as XML and breaks itself sometimes.  Sigh */
+	    /*<![CDATA[*/
+	    var app = angular.module("editPersonnelApp", []);
+	    app.controller("editPersonnelCtrl", function($scope, $http) {
+			
+			
+	    	});
+	    /*]]>*/
+		</script>
+		<div ng-app="editPersonnelApp" ng-controller="editPersonnelCtrl">
+			<div
+				style="float: left; width: 80%; border-left: 1px solid #bbb; padding-left: 3%; height: 100%; overflow-y: auto">
+				<h2 id="header0">Fill Prescriptions</h2>
+			</div>
+		</div>
+
+	</div>
+</body>
+</html>

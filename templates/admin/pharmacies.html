@@ -1,0 +1,364 @@
+<html xmlns:th="http://www.thymeleaf.org">
+  <head th:include="layout :: head(title=~{::title},links=~{})">
+    <title>Manage Pharmacies</title>
+    <!-- Angular and Bootstrap files  -->
+    <link
+      rel="stylesheet"
+      href="//netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  </head>
+  <body th:include="layout :: body" th:with="content=~{::content}">
+    <div th:fragment="content">
+      <!-- AngularJS Code -->
+      <script th::inline="javascript">
+        /*<![CDATA[*/
+        /* I'd prefer to have this code in the head, but this seems to make everything happy */
+        var app = angular.module("managePharmaciesApp", []);
+        app.controller("managePharmaciesCtrl", ($scope, $http) => {
+          $scope.loadPharmacies = () => {
+            $http.get("/iTrust2/api/v1/pharmacies").then(
+              (res) => {
+                $scope.pharmacies = res.data;
+              },
+              (err) => {
+                $scope.pharmacies = [];
+              }
+            );
+          };
+
+          $scope.loadStates = () => {
+            $http.get("/iTrust2/api/v1/state").then((res) => {
+              $scope.states = res.data;
+            });
+          };
+
+          var checkValidPharmacyForm = (pharmacy) => {
+            var err = [];
+            for (var i = 0; i < $scope.pharmacies.length; i++) {
+              if (
+                pharmacy.address === $scope.pharmacies[i].address &&
+                pharmacy.state === $scope.pharmacies[i].state &&
+                pharmacy.zip === $scope.pharmacies[i].zip
+              ) {
+                err.push("A pharmacy already exists at this loaction");
+              }
+            }
+            if (!/(^\d{5}$)|(^\d{5}-\d{4}$)/.test(pharmacy.zip)) {
+              err.push("zipcode must be 5 numbers");
+            }
+            if (
+              pharmacy.name === "" ||
+              pharmacy.address === "" ||
+              pharmacy.state == "" ||
+              pharmacy.zip === ""
+            ) {
+              err.push("Make sure no fields are empty");
+            }
+            return err.join(".  ");
+          };
+
+          var checkValidPharmacyFormEdit = (pharmacy) => {
+            console.log(pharmacy);
+            var err = [];
+            for (var i = 0; i < $scope.pharmacies.length; i++) {
+              if (
+                pharmacy.address === $scope.pharmacies[i].address &&
+                pharmacy.state === $scope.pharmacies[i].state &&
+                pharmacy.zip === $scope.pharmacies[i].zip &&
+                pharmacy.id !== $scope.pharmacies[i].id
+              ) {
+                err.push("A pharmacy already exists at this loaction");
+              }
+            }
+
+            if (!/(^\d{5}$)|(^\d{5}-\d{4}$)/.test(pharmacy.zip)) {
+              err.push("zipcode must be 5 numbers");
+            }
+            if (
+              pharmacy.name === "" ||
+              pharmacy.address === "" ||
+              pharmacy.state == "" ||
+              pharmacy.zip === ""
+            ) {
+              err.push("Make sure no fields are empty");
+            }
+            return err.join(".  ");
+          };
+
+          $scope.addPharmacy = () => {
+            var err = checkValidPharmacyForm($scope.pharmacy);
+            if (err) {
+              $scope.errorAdding = err;
+              $scope.successMessage = "";
+            } else {
+              $http.post("/iTrust2/api/v1/pharmacies", $scope.pharmacy).then(
+                (res) => {
+                  $scope.loadPharmacies();
+                  $scope.pharmacy.name = "";
+                  $scope.pharmacy.address = "";
+                  $scope.pharmacy.state = "";
+                  $scope.pharmacy.zip = "";
+
+                  $scope.errorAdding = "";
+                  $scope.successMessage = "Pharmacy Added Successfully";
+                },
+                (rej) => {
+                  $scope.errorAdding = "Could not add Pharmacy";
+                  $scope.successMessage = "";
+                }
+              );
+            }
+          };
+
+          $scope.deletePharmacy = (pharmacy) => {
+            $http.delete("/iTrust2/api/v1/pharmacies/" + pharmacy.id).then(
+              (res) => {
+                $scope.loadPharmacies();
+              },
+              (rej) => {
+                $scope.loadPharmacies();
+                $scope.message = "Could not remote pharmacy";
+              }
+            );
+          };
+
+          $scope.getTemplate = (pharmacy) => {
+            if (pharmacy.id === $scope.selectedPharmacy.id) return "edit";
+            else return "view";
+          };
+
+          $scope.editPharmacy = (pharmacy) => {
+            $scope.selectedPharmacy = angular.copy(pharmacy);
+          };
+
+          $scope.savePharmacy = () => {
+            var err = checkValidPharmacyFormEdit($scope.selectedPharmacy);
+            if (err) {
+              $scope.errorAdding = err;
+            } else {
+              $http
+                .put(
+                  "/iTrust2/api/v1/pharmacies/" + $scope.selectedPharmacy.id,
+                  $scope.selectedPharmacy
+                )
+                .then(
+                  (res) => {
+                    $scope.loadPharmacies();
+                    $scope.resetSelected();
+                  },
+                  (rej) => {
+                    $scope.errorAdding = "Failed to edit pharmacy";
+                  }
+                );
+            }
+          };
+
+          $scope.resetSelected = () => {
+            $scope.selectedPharmacy = {};
+          };
+
+          $scope.resetSelected();
+          $scope.loadStates();
+          $scope.loadPharmacies();
+        });
+      </script>
+      <!-- End AngularJS Code-->
+
+      <div ng-app="managePharmaciesApp" ng-controller="managePharmaciesCtrl">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="panel panel-primary">
+                <div class="panel-heading">
+                  <h3>Admin Manage Pharmacies</h3>
+                </div>
+                <div class="panel-body">
+                  <table class="table table-bordered">
+                    <caption>
+                      Existing Pharmacies:
+                    </caption>
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Address</th>
+                        <th>State</th>
+                        <th>ZIP</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        name="pharmacyTableRow"
+                        ng-repeat="p in pharmacies | orderBy: 'name'"
+                        ng-include="getTemplate(p)"
+                        pharmacyId="{{p.id}}"
+                      ></tr>
+                    </tbody>
+                  </table>
+
+                  <!-- table in view mode -->
+                  <script type="text/ng-template" id="view">
+                    <td name="nameCell">{{p.name}}</td>
+                    <td name="addressCell">{{p.address}}</td>
+                    <td name="stateCell">{{p.state}}</td>
+                    <td name="zipCell">{{p.zip}}</td>
+                    <td>
+                      <div class="row text-center">
+                          <div class="col-md-6">
+                              <input type="button" value="Edit" class="btn btn-success" name="editPharmacy" ng-click="editPharmacy(p)"/>
+                          </div>
+                          <div class="col-md-6">
+                              <input type="button" value="Delete" class="btn btn-danger" name="deletePharmacy" ng-click="deletePharmacy(p)"/>
+                          </div>
+                      </div>
+                    </td>
+                  </script>
+
+                  <!-- table in edit mode -->
+                  <script type="text/ng-template" id="edit">
+                    <td name="editNameCell">
+                        <input type="text" class="form-control" ng-model="selectedPharmacy.name" />
+                    </td>
+                    <td name="editAddressCell">
+                        <input type="text" class="form-control" ng-model="selectedPharmacy.address" />
+                    </td>
+                    <td name="editStateCell">
+                        <select
+                            class="form-control"
+                            name="state"
+                            ng-model="selectedPharmacy.state"
+                            ng-options="state.id as state.name for state in states"
+                        >
+                            <option value="">Select One</option>
+                        </select>
+                    </td>
+                    <td name="editZipCell">
+                        <input type="text" class="form-control" ng-model="selectedPharmacy.zip" />
+                    </td>
+                    <td>
+                        <div class="row text-center">
+                            <div class="col-md-6">
+                                <input type="button" value="Save" class="btn btn-success" name="savePharmacy" ng-click="savePharmacy()"/>
+                            </div>
+                            <div class="col-md-6">
+                                <input type="button" value="Cancel" class="btn btn-danger" name="cancelEdit" ng-click="resetSelected()"/>
+                            </div>
+                        </div>
+                    </td>
+                  </script>
+
+                  <!-- End Existing Pharmacies Table-->
+
+                  <div class="row">
+                    <div class="col-md-12">
+                      <div class="panel panel-default">
+                        <div class="panel-heading">Add a Pharmacy</div>
+                        <div class="panel-body">
+                          <form
+                            name="addPharmacyForm"
+                            ng-submit="addPharmacy(addPharmacyForm.$valid)"
+                          >
+                            <div class="form-group row">
+                              <div class="form-group col-md-12">
+                                <label for="name">Name:</label>
+                                <input
+                                  class="form-control"
+                                  type="text"
+                                  name="name"
+                                  id="name"
+                                  ng-model="pharmacy.name"
+                                />
+                              </div>
+                            </div>
+                            <div class="form-group row">
+                              <div class="form-group col-md-6">
+                                <label for="address">Address:</label>
+                                <input
+                                  class="form-control"
+                                  type="text"
+                                  name="address"
+                                  id="address"
+                                  ng-model="pharmacy.address"
+                                />
+                              </div>
+                              <div class="form-group col-md-2">
+                                <label for="state">State:</label>
+                                <select
+                                  class="form-control"
+                                  id="state"
+                                  name="state"
+                                  ng-model="pharmacy.state"
+                                  ng-options="state.id as state.name for state in states"
+                                >
+                                  <option value="">Select One</option>
+                                </select>
+                              </div>
+                              <div class="form-group col-md-4">
+                                <label for="zipcode">Zip Code:</label>
+                                <input
+                                  class="form-control"
+                                  type="text"
+                                  name="zipcode"
+                                  id="zip"
+                                  ng-model="pharmacy.zip"
+                                />
+                              </div>
+                            </div>
+                            <input
+                              class="btn btn-primary"
+                              type="submit"
+                              id="submit"
+                              value="Add Pharmacy"
+                            />
+                          </form>
+                          <!-- End Add Pharmacy Form -->
+                          <div>
+                            <p
+                              style="color: red"
+                              ng-model="errorAdding"
+                              id="errP"
+                            >
+                              {{errorAdding}}
+                            </p>
+                          </div>
+                          <div>
+                            <p
+                              style="color: green"
+                              ng-model="successMessage"
+                              id="success"
+                            >
+                              {{successMessage}}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Boostrap scripts-->
+      <!-- <script
+      src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+      integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+      integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+      integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+      crossorigin="anonymous"
+    ></script> -->
+    </div>
+  </body>
+</html>

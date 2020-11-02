@@ -1,0 +1,61 @@
+<html>
+    <head>
+        <title>PyTrust2 | Login</title>
+        <!-- Latest compiled and minified CSS -->
+        <link
+            rel="stylesheet"
+            href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+        />
+        <link rel="icon" type="image/ico" href="static/img/favicon.ico" />
+        <style>
+            body {
+                background-image: url("static/img/login/DrJenkins.jpg");
+                background-size: cover;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 col-md-offset-4">
+                    <br />
+                    <div class="panel panel-default">
+                        <div class="panel-heading text-center">
+                            <h1>Login to PyTrust</h1>
+                        </div>
+                        <div class="panel-body" style="background: #eeeeee">
+                            <form name="login_form" method="post">
+                                <div class="form-group">
+                                    <label for="username">Username</label>
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        id="username"
+                                        name="username"
+                                        placeholder="Username"
+                                    />
+                                </div>
+                                <div class="form-group">
+                                    <label for="password">Password</label>
+                                    <input
+                                        type="password"
+                                        class="form-control"
+                                        id="password"
+                                        name="password"
+                                        placeholder="Password"
+                                    />
+                                </div>
+                                <button
+                                    type="submit"
+                                    class="btn btn-primary btn-block"
+                                >
+                                    Login
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
