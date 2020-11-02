@@ -5,6 +5,7 @@ the number of imports in the main app and make it easier to add and remove
 views.
 """
 
+from .login import login_view_controller as login
 from .admin import admin_view_controller as admin
 #from .diseasecontrol import diseasecontrol_view_controller as diseasecontrol
 from .er import er_view_controller as er
@@ -20,6 +21,7 @@ BASE_URL = None
 
 # Collection of blueprints
 blueprints = {
+    login.login_view_controller,
     admin.admin_view_controller,
     #diseasecontrol.diseasecontrol_view_controller,
     er.er_view_controller,
