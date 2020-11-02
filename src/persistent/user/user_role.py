@@ -18,12 +18,12 @@ class UserRole(enum.Enum):
         self.role_name = role_name
         self.landing_page = landing_page
 
-    PATIENT = "patient", "patient/index"
-    HCP = "hcp", "hcp/index"
-    ADMIN = "admin", "admin/index"
-    ER = "er", "er/index"
-    LABTECH = "labtech", "labtech/index"
-    OD = "od", "hcp/index"
-    OPH = "oph", "hcp/index"
-    VIROLOGIST = "virologist", "hcp/index"
-    PHARMACIST = "pharmacist", "pharmacist/index"
+    PATIENT = "patient", "patient"
+    HCP = "hcp", "hcp"
+    ADMIN = "admin", "admin"
+    ER = "er", "er"
+    LABTECH = "labtech", "labtech"
+    OD = "od", "hcp"
+    OPH = "oph", "hcp"
+    VIROLOGIST = "virologist", "hcp"
+    PHARMACIST = "pharmacist", "pharmacist"
