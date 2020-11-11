@@ -1,3 +1,11 @@
+"""
+This file contains API methods that relate to users.
+This included CRUD operations on user objects, as well as related things like
+getting a list of all user roles.
+
+:author William Boyles:
+"""
+
 from flask import Blueprint, jsonify, request
 from http import HTTPStatus
 from marshmallow.exceptions import ValidationError
@@ -5,6 +13,7 @@ from marshmallow.exceptions import ValidationError
 from ...persistent.persistent import db
 from ...persistent.user.user import User, UserSchema
 from ...persistent.user.user_role import UserRole
+from ...decorators import has_roles
 
 api_user_controller = Blueprint("api_user_controller",
                                 __name__,
@@ -14,7 +23,12 @@ api_user_controller = Blueprint("api_user_controller",
 
 
 @api_user_controller.route("/users", methods=["GET"])
+@has_roles(roles=['admin'])
 def get_all_users():
+    """
+    Gets a list of all users in the DB
+    """
+
     all_users = User.query.all()
 
     user_schema = UserSchema(many=True)
@@ -24,7 +38,12 @@ def get_all_users():
 
 
 @api_user_controller.route("/users", methods=["POST"])
+@has_roles(roles=['admin'])
 def make_user():
+    """
+    Creates a user
+    """
+
     json_data = request.json
     if 'password' not in json_data:
         return "No password provided", HTTPStatus.BAD_REQUEST
@@ -51,7 +70,12 @@ def make_user():
 
 
 @api_user_controller.route("/user_roles", methods=["GET"])
+@has_roles(roles=['admin'])
 def get_all_user_roles():
+    """
+    Gets a list of all user roles defined in the UserRole enum.
+    """
+
     user_roles = [role.value for role in UserRole]
 
     return jsonify(user_roles), HTTPStatus.OK
