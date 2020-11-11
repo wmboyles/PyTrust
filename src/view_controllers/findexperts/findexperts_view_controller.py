@@ -1,5 +1,7 @@
 from flask import Blueprint, render_template
 
+from ...decorators import has_roles
+
 findexperts_view_controller = Blueprint("findexperts_view_controller",
                                         __name__,
                                         template_folder="templates",
@@ -9,6 +11,7 @@ findexperts_view_controller = Blueprint("findexperts_view_controller",
 BASE_FILE_URL = "findexperts/"
 
 
+# TODO: Does this need any controllers?
 @findexperts_view_controller.route("/")
 def home():
     return render_template(BASE_FILE_URL + "index.html")

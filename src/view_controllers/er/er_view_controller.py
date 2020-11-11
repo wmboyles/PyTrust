@@ -1,4 +1,6 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, redirect
+
+from ...decorators import has_roles
 
 BASE_URL = "/er"
 
@@ -12,5 +14,6 @@ BASE_FILE_URL = "er/"
 
 
 @er_view_controller.route("/")
+@has_roles(roles=["er"], return_if_fail=redirect("/login"))
 def home():
     return render_template(BASE_FILE_URL + "index.html")
