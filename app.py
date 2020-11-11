@@ -50,4 +50,5 @@ def create_app(refresh_db=False):
 
 if __name__ == "__main__":
     app = create_app()
+    #app.run(ssl_context="adhoc")
     app.run()
