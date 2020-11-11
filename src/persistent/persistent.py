@@ -2,6 +2,8 @@
 This file initializes the SQLAlchemy and Marshmallow objects
 It imports from a models module that contains imports of all the persistence 
 classes.
+
+:author William Boyles:
 """
 
 from flask_sqlalchemy import SQLAlchemy

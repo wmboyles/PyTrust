@@ -1,3 +1,9 @@
+"""
+This file contains routes for the pages related to logging in.
+
+:author William Boyles:
+"""
+
 from flask import Blueprint, render_template, request, redirect, session
 
 # Most view classes shouldn't work so directly with persistence classes

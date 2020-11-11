@@ -1,3 +1,9 @@
+"""
+This file contains routes for the pages a pharmacist can see.
+
+:author William Boyles:
+"""
+
 from flask import Blueprint, render_template, redirect
 
 from ...decorators import has_roles

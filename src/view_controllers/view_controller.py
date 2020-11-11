@@ -3,6 +3,8 @@ This file essentially imports a list of all view blueprints and saves them in a
 collection that can be imported by the main app. This is meant to cut down on
 the number of imports in the main app and make it easier to add and remove
 views.
+
+:author William Boyles:
 """
 
 from .login import login_view_controller as login

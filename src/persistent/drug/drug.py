@@ -3,7 +3,7 @@ This file contains stores class infomation on drugs, including the fields and
 methods a drug has in the Drug class, as well as how the drug is serialized as
 JSON in DrugSchema.
 
-
+:author William Boyles:
 """
 
 from marshmallow.decorators import post_load
@@ -37,14 +37,30 @@ class Drug(db.Model):
     # methods because that's handled by the oclumn definitions.
 
     @validates('code')
-    def validate_code(self, key, code: str):
+    def validate_code(self, key, code: str) -> str:
+        """
+        Validates that code field matches the required pattern.
+
+        :param code: string NDC code to validate
+        :return: validated NDC code
+        :raises AssertionError: if code does not match pattern
+        """
+
         if not re.fullmatch("\d{4}-\d{4}-\d{2}", code):
             raise AssertionError("Code does not match pattern")
 
         return code
 
     @validates('type')
-    def validate_type(self, key, dtype: DrugType):
+    def validate_type(self, key, dtype: DrugType) -> DrugType:
+        """
+        Validates that the drug type field is not unspecified.
+
+        :param dtype: DrugType to validate
+        :returns: validated DrugType
+        :raises AssertionError: if dtype is invalid
+        """
+
         if dtype == DrugType.Not_Specified:
             raise AssertionError(
                 "Drug type cannot be not specified for creating drugs")
