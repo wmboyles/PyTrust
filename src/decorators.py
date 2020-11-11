@@ -1,8 +1,17 @@
+"""
+Contains function decorators used throughout the project.
+
+:author William Boyles:
+"""
+
+from http import HTTPStatus
 from flask import session
 from functools import wraps
 
+DEFAULT_RETURN_IF_FAIL = ("User not authorized", HTTPStatus.UNAUTHORIZED)
 
-def has_roles(roles, return_if_fail):
+
+def has_roles(roles, return_if_fail=DEFAULT_RETURN_IF_FAIL):
     """
     Ensures that user is logged in as someone with a given role.
     
