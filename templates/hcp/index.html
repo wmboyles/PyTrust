@@ -1,13 +1,14 @@
-<html xmlns:th="http://www.thymeleaf.org">
-    <head th:include="layout :: head(title=~{::title},links=~{})">
+<html>
+    <head>
         <title>HCP Home</title>
     </head>
-    <body th:include="layout :: body" th:with="content=~{::content}">
-        <div th:fragment="content">
+    <body>
+        <div>
             <h1>Welcome to iTrust2 - HCP</h1>
-            <div th:include="logView :: log"></div>
 
-            <a href="/logout">Log Out</a>
+            <ul>
+                <li><a href="/logout">Log Out</a></li>
+            </ul>
         </div>
     </body>
 </html>
