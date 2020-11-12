@@ -62,4 +62,4 @@ def logout():
     session.pop('password_hash', None)
     session.pop('role', None)
 
-    return render_template(BASE_FILE_URL + "login.html")
+    return redirect("login")
