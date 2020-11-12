@@ -18,6 +18,7 @@ BASE_FILE_URL = "hcp/"
 
 
 @hcp_view_controller.route("/")
-@has_roles(roles=["hcp"], return_if_fail=redirect("/login"))
+@has_roles(roles=['hcp', 'oph', 'od', 'virologist'],
+           return_if_fail=redirect("/login"))
 def home():
     return render_template(BASE_FILE_URL + "index.html")
