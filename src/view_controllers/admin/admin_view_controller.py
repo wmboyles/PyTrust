@@ -15,9 +15,16 @@ admin_view_controller = Blueprint("admin_view_controller",
                                   url_prefix="/admin")
 
 BASE_FILE_URL = "admin/"
+RETURN_IF_FAIL = redirect("/login")
 
 
 @admin_view_controller.route("/")
-@has_roles(roles=["admin"], return_if_fail=redirect("/login"))
+@has_roles(roles=["admin"], return_if_fail=RETURN_IF_FAIL)
 def home():
     return render_template(BASE_FILE_URL + "index.html")
+
+
+@admin_view_controller.route("/drugs")
+@has_roles(roles=['admin'], return_if_fail=RETURN_IF_FAIL)
+def manage_drugs():
+    return render_template(BASE_FILE_URL + "drugs.html")

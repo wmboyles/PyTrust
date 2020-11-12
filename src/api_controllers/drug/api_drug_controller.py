@@ -38,7 +38,7 @@ def get_all_drugs():
     return jsonify(out_drugs), HTTPStatus.OK
 
 
-@api_drug_controller.route("/drugs", methods=["POST"])
+@api_drug_controller.route("/drugs", methods=['POST'])
 @has_roles(roles=['admin'])
 def make_drug():
     """
@@ -65,7 +65,54 @@ def make_drug():
     return out_drug, HTTPStatus.OK
 
 
-@api_drug_controller.route("/drug_types", methods=["GET"])
+@api_drug_controller.route("/drugs", methods=['PUT'])
+@has_roles(roles=['admin'])
+def edit_drug():
+    """
+    Edits an existing drug
+    """
+
+    json_data = request.json
+
+    drug_schema = DrugSchema()
+    try:
+        new_drug = drug_schema.load(json_data)
+    except (AssertionError, ValidationError) as e:
+        return str(e), HTTPStatus.BAD_REQUEST
+
+    old_drug = Drug.query.get(new_drug.id)
+    if old_drug is None:
+        return "No drug with that id", HTTPStatus.NOT_FOUND
+
+    # merge existing and new, matched by id, keep new when differences
+    db.session.merge(new_drug)
+    db.session.commit()
+
+    out_drug = drug_schema.dump(new_drug)
+    return out_drug, HTTPStatus.OK
+
+
+@api_drug_controller.route("/drugs/<int:id>", methods=['DELETE'])
+@has_roles(roles=['admin'])
+def delete_drug(id):
+    """
+    Deletes a drug with a given id
+
+    :param id: id of Drug in the db to delete
+    """
+
+    drug = Drug.query.get(id)
+
+    if drug is None:
+        return "No drug with that id", HTTPStatus.NOT_FOUND
+
+    db.session.delete(drug)
+    db.session.commit()
+
+    return "Successfully deleted drug", HTTPStatus.OK
+
+
+@api_drug_controller.route("/drug_types", methods=['GET'])
 @has_roles(roles=['admin', 'patient'])
 def get_all_drug_types():
     """
