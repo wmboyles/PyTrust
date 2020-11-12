@@ -22,7 +22,7 @@ api_user_controller = Blueprint("api_user_controller",
                                 url_prefix="/")
 
 
-@api_user_controller.route("/users", methods=["GET"])
+@api_user_controller.route("/users", methods=['GET'])
 @has_roles(roles=['admin'])
 def get_all_users():
     """
@@ -37,7 +37,7 @@ def get_all_users():
     return jsonify(out_users), HTTPStatus.OK
 
 
-@api_user_controller.route("/users", methods=["POST"])
+@api_user_controller.route("/users", methods=['POST'])
 @has_roles(roles=['admin'])
 def make_user():
     """
@@ -69,7 +69,53 @@ def make_user():
     return out_user, HTTPStatus.OK
 
 
-@api_user_controller.route("/user_roles", methods=["GET"])
+@api_user_controller.route("/users", methods=['PUT'])
+@has_roles(roles=['admin'])
+def edit_user():
+    """
+    Edits an existing user
+    """
+
+    json_data = request.json
+
+    user_schema = UserSchema()
+    try:
+        new_user = user_schema.load(json_data)
+    except (AssertionError, ValidationError) as e:
+        return str(e), HTTPStatus.BAD_REQUEST
+
+    old_user = User.query.get(new_user.id)
+    if old_user is None:
+        return "No user with that id", HTTPStatus.NOT_FOUND
+
+    db.session.merge(new_user)
+    db.session.commit()
+
+    out_user = user_schema.dump(new_user)
+    return out_user, HTTPStatus.OK
+
+
+@api_user_controller.route("/users/<int:id>", methods=['DELETE'])
+@has_roles(roles=['admin'])
+def delete_user(id):
+    """
+    Deletes a user with a given id
+
+    :param id: id of User in the db to delete
+    """
+
+    user = User.query.get(id)
+
+    if user is None:
+        return "No user with that id", HTTPStatus.NOT_FOUND
+
+    db.session.delete(user)
+    db.session.commit()
+
+    return "Successfully deleted user", HTTPStatus.OK
+
+
+@api_user_controller.route("/user_roles", methods=['GET'])
 @has_roles(roles=['admin'])
 def get_all_user_roles():
     """

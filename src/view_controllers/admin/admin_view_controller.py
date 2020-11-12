@@ -28,3 +28,9 @@ def home():
 @has_roles(roles=['admin'], return_if_fail=RETURN_IF_FAIL)
 def manage_drugs():
     return render_template(BASE_FILE_URL + "drugs.html")
+
+
+@admin_view_controller.route("/users")
+@has_roles(roles=['admin'], return_if_fail=RETURN_IF_FAIL)
+def manage_users():
+    return render_template(BASE_FILE_URL + "users.html")

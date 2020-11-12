@@ -1,246 +1,303 @@
-<html xmlns:th="http://www.thymeleaf.org">
-<head th:include="layout :: head(title=~{::title},links=~{})">
-<title>Request Appointment</title>
-</head>
-<body th:include="layout :: body" th:with="content=~{::content}">
-	<div th:fragment="content">
-		<script th::inline="javascript">
-		/* Otherwise Thymeleaf tries to parse Javascript as XML and breaks itself sometimes.  Sigh */
-		/*<![CDATA[*/
- 			var app = angular.module("manageUsersApp", []);
-			app.controller("manageUsersCtrl", function($scope, $http) {
-				
-				var checkValidUserForm = function(user) {
-					var err = [];
-					for(var i = 0; i < $scope.users.length; i++ ) {
-						if( $scope.user.username === $scope.users[i].username) {
-						    err.push("Username already exists");
-						}
-					}
-	       	if( $scope.user.password === $scope.user.password2) {
-					    // do nothing
-					} else {
-						err.push("passwords do not match" );
-					}
-	 				if( $scope.user.password.length < 6)
-	 					err.push("Password must be more than 6 characters long");
-					return err.join(".  ");
-				}
-				
-			
-		    $scope.users = [];
-	        $scope.loadUsers = function () {
-	          $http.get("/iTrust2/api/v1/users").then(
-	            function (response) {
-	              $scope.users = response.data;
-	              $scope.message = "";
-	            }, function (rejection) {
-	              $scope.users = [];
-	              $scope.message = "Could not display users";
-	            });
-	        }
-	        
-	        $scope.addUser = function () {
-		          var err = checkValidUserForm($scope.user);
-		          if (err) {
-		            $scope.errorAdding = err;
-		            $scope.successMessage = "";
-		          } else {
-		            $http.post("/iTrust2/api/v1/users", $scope.user).then(
-		              function (response) {
-		            	    $scope.loadUsers();
-		                $scope.user.username = "";
-		                $scope.user.password = "";
-		                $scope.user.password2 = "";
-		                $scope.user.enabled = false;
-		                $scope.user.role = "ROLE_PATIENT";
-		                $scope.errorAdding = "";
-		                $scope.successMessage = "User added successfully.";
-		              }, function (rejection) {
-		            	    $scope.loadUsers();
-		                $scope.errorAdding = "Could not add User.";
-		                $scope.successMessage = "";
-		              });
-		          }
-	        }
-			
-	        $scope.confirmDelete = function (user) {
-	        	if (confirm("Are you sure you want to delete the user")) {
-	        		$scope.deleteUser(user);
-	        	}
-	        }
-	        
-	        $scope.deleteUser = function(user) {
-	            $http.delete('/iTrust2/api/v1/users/' + user.username).then(
-	              function (response) {
-	                $scope.loadUsers();
-	              }, function (rejection) {
-	            	    $scope.loadUsers();
-	                $scope.message = "Could not remove user";
-	              });
-	          }
+<!DOCTYPE html>>
+<html>
+    <head>
+        <title>Admin | Manage Users</title>
+        <!-- Boostrap import -->
+        <link
+            rel="stylesheet"
+            href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+        />
+        <!-- AngularJS import -->
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+        <!-- AngularJS code -->
+        <script>
+            var app = angular.module(
+                "manageUsersApp",
+                [],
+                // Change the delimiter symbols to [[ and ]]
+                ($interpolateProvider) => {
+                    $interpolateProvider.startSymbol("[[");
+                    $interpolateProvider.endSymbol("]]");
+                }
+            );
+            app.controller("manageUsersCtrl", ($scope, $http) => {
+                // Is the user being edited or viewed?
+                $scope.get_template = (user) => {
+                    if (user.id === $scope.selected_user.id) {
+                        return "edit";
+                    } else {
+                        return "view";
+                    }
+                };
 
-	        $scope.getTemplate = function (user) {
-	          return 'view';
-	        };
-	        
-	        $scope.enabledText = function(user) {
-	        	  if(user.enabled) {
-	        		  return 'yes';        		  
-	        	  } else {
-	        		  return 'no';
-	        	  }
-	        }
-	        
-	        $scope.getRole = function(user) {
-	        	  if(user.role === "ROLE_PATIENT") {
-	        		  return 'Patient';
-	        	  } else if(user.role === "ROLE_HCP") {
-	        		  return 'Healthcare Provider';
-	        	  } else if(user.role === "ROLE_OD") {
-	        		  return 'Optometrist HCP';
-	        	  }else if(user.role === "ROLE_OPH") {
-	        		  return 'Ophthalmologist HCP';
-	        	  }else if(user.role === "ROLE_ADMIN") {
-	        		  return 'Admin';
-	        	  } else if(user.role === "ROLE_ER") {
-	        		  return 'Emergency Responder';
-	        	  } else if (user.role === "ROLE_VIROLOGIST") {
-	        		  return 'Virologist HCP';
-	        	  } else if (user.role === "ROLE_PHARMACIST") {
-	        		  return 'Pharmacist HCP';
-	        	  } else {
-	        		  return 'Lab Tech';
-	        	  }
-	        }
-			
-		$scope.loadUsers();
-		});
-			
-</script>
-		<div ng-app="manageUsersApp" ng-controller="manageUsersCtrl">
-			<div class="container">
-				<div class="row">
-					<div class="col-md-12">
-						<div class="panel panel-primary">
-							<div class="panel-heading">
-								<h3>Admin Manage Users</h3>
-							</div>
-							<div class="panel-body">
-								<table class="table table-bordered">
-									<caption>Existing Users:</caption>
-									<thead>
-										<tr>
-											<th>Username</th>
-											<th>Role</th>
-											<th>Enabled</th>
-											<th>Delete User</th>
-										</tr>
-									</thead>
-									<tbody>
-										<tr name="userTableRow"
-											ng-repeat="u in users | orderBy: 'name'"
-											ng-include="getTemplate(u)" userId={{u.username}}>
-										</tr>
-									</tbody>
-								</table>
-								<script type="text/ng-template" id="view">
-                <td name="nameCell">{{u.username}}</td>
-			    <td name="roleCell">{{getRole(u)}}</td>
-				<td name="enabledCell">{{enabledText(u)}}</td>
-                <td> 
-                  <div class="row text-center">
-                    <div class="col-md-6">
-                      <input type="button" value="Delete" class="btn btn-danger" name="delete{{u.username}}" ng-click="confirmDelete(u)"/>                          
+                // check that user fields are valid
+                var check_user = (user) => {
+                    var err = [];
+                    if (!user.username) {
+                        err.push("User must have a username");
+                    }
+                    if (!user.password && !user.password_hash) {
+                        err.push("User must have a password");
+                    }
+                    if (!user.role) {
+                        err.push("User must have a role");
+                    }
+
+                    return err.join(". ");
+                };
+
+                // load all the users from the DB
+                $scope.load_users = () => {
+                    $http.get("/api/users").then(
+                        (res) => {
+                            $scope.users = res.data;
+                        },
+                        (err) => {
+                            $scope.users = [];
+                        }
+                    );
+                };
+
+                // load all the user roles from the db
+                $scope.load_user_roles = () => {
+                    $http.get("/api/user_roles").then(
+                        (res) => {
+                            $scope.roles = res.data;
+                        },
+                        (err) => {
+                            $scope.roles = [];
+                        }
+                    );
+                };
+
+                // user edit operation is cancelled
+                $scope.reset_edit = () => {
+                    $scope.selected_user = {};
+                };
+
+                // user has been submitted
+                $scope.reset_create = () => {
+                    $scope.user = {};
+                };
+
+                // reset success and error messages
+                $scope.reset_messages = () => {
+                    $scope.error_message = "";
+                    $scope.success_message = "";
+                };
+
+                // when user is selected for editing
+                $scope.edit_user = (user) => {
+                    $scope.selected_user = angular.copy(user);
+                };
+
+                // user has been edited and now should be saved
+                $scope.save_user = () => {
+                    var err = check_user($scope.selected_user);
+                    if (err) {
+                        $scope.error_message = err;
+                        return;
+                    }
+
+                    $http.put("/api/users", $scope.selected_user).then(
+                        (res) => {
+                            $scope.reset_edit();
+                            $scope.load_users();
+                            $scope.error_message = "";
+                            $scope.success_message = "Successfully edited user";
+                        },
+                        (err) => {
+                            $scope.error_message = "" + err.data;
+                            $scope.success_message = "";
+                        }
+                    );
+                };
+
+                // user is being deleted
+                $scope.delete_user = (user) => {
+                    if (confirm("Are you sure you want to delete this user?")) {
+                        $http.delete("/api/users/" + user.id).then(
+                            (res) => {
+                                $scope.load_users();
+                                $scope.error_message = "";
+                                $scope.success_message =
+                                    "Successfully deleted user";
+                            },
+                            (err) => {
+                                $scope.error_message = err.data;
+                                $scope.success_message = "";
+                            }
+                        );
+                    }
+                };
+
+                // a new user has been submitted for creation
+                $scope.add_user = () => {
+                    $http.post("/api/users", $scope.user).then(
+                        (res) => {
+                            $scope.reset_create();
+                            $scope.load_users();
+                            $scope.error_message = "";
+                            $scope.success_message =
+                                "Successfully created user";
+                        },
+                        (err) => {
+                            $scope.error_message = err.data;
+                            $scope.success_message = "";
+                        }
+                    );
+                };
+
+                // Runs on page load
+                $scope.reset_edit();
+                $scope.reset_create();
+                $scope.reset_messages();
+
+                $scope.load_users();
+                $scope.load_user_roles();
+            });
+        </script>
+    </head>
+    <body ng-app="manageUsersApp" ng-controller="manageUsersCtrl">
+        <div class="container">
+            <div class="row">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h1>Admin Manage Users</h1>
                     </div>
-                  </div>
-                </td>
-                </script>
-								<br>
-								<style>
-form {
-	width: 400px;
-}
+                    <div class="panel-body">
+                        <table class="table table-bordered">
+                            <caption>
+                                Existing Users
+                            </caption>
+                            <thead>
+                                <tr scope="row">
+                                    <th scope="col">Username</th>
+                                    <th scope="col">Role</th>
+                                    <th scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr
+                                    ng-repeat="u in users"
+                                    ng-include="get_template(u)"
+                                ></tr>
+                            </tbody>
+                        </table>
 
-.label {
-	float: right;
-	text-align: left;
-	width: 200px;
-	height: 20px;
-	color: #000000
-}
+                        <!-- table in view mode -->
+                        <script type="text/ng-template" id="view">
+                            <td scope="col">[[u.username]]</td>
+                            <td scope="col">[[u.role]]</td>
+                            <td scope="col">
+                            	<button class="col-md-6 btn btn-success" ng-click="edit_user(u)">Edit</button>
+                            	<button class="col-md-6 btn btn-danger" ng-click="delete_user(u)">Delete</button>
+                            </td>
+                        </script>
 
-input[type=text] {
-	float: right;
-	text-align: left;
-	width: 200px;
-	height: 20px
-}
+                        <!-- table in edit mode -->
+                        <script type="text/ng-template" id="edit">
+                            <td scope="col">
+                            <input type="text" class="form-control" ng-model="selected_user.username" maxlength="255">
+                            </td>
+                            <td scope="col">
+                            <select class="form-control" ng-model="selected_user.role">
+                            	<option ng-repeat="r in roles">[[r]]</option>
+                            </select>
+                            </td>
+                            <td scope="col">
+                                <button class="col-md-6 btn btn-success" ng-click="save_user()">Save</button>
+                            	<button class="col-md-6 btn btn-danger" ng-click="reset_edit()">Cancel</button>
+                            </td>
+                        </script>
 
-input[type=password] {
-	float: right;
-	text-align: left;
-	width: 200px;
-	height: 20px
-}
+                        <!-- create a new user, success and error messages -->
+                        <div class="panel panel-default">
+                            <div class="panel-heading">Add a User</div>
+                            <div class="panel-body">
+                                <!-- Create a new user form -->
+                                <form
+                                    class="form-horizontal"
+                                    role="form"
+                                    name="add_user_form"
+                                    ng-submit="add_user(add_user_form.$valid)"
+                                >
+                                    <!-- username, password, role -->
+                                    <div class="row">
+                                        <!-- username -->
+                                        <div class="col-md-4">
+                                            <label for="user_username"
+                                                >Username</label
+                                            >
+                                            <input
+                                                type="text"
+                                                class="form-control"
+                                                name="user_username"
+                                                ng-model="user.username"
+                                                minlength="1"
+                                                maxlength="255"
+                                                required
+                                            />
+                                        </div>
+                                        <!-- password -->
+                                        <div class="col-md-4">
+                                            <label for="user_password"
+                                                >Password</label
+                                            >
+                                            <input
+                                                type="password"
+                                                class="form-control"
+                                                name="user_password"
+                                                ng-model="user.password"
+                                                minlength="1"
+                                                maxlength="255"
+                                                required
+                                            />
+                                        </div>
+                                        <!-- role -->
+                                        <div class="col-md-4">
+                                            <label for="user_role">Role</label>
+                                            <select
+                                                class="form-control"
+                                                name="user_role"
+                                                ng-model="user.role"
+                                                required
+                                            >
+                                                <option value="">
+                                                    Select One
+                                                </option>
+                                                <!-- prettier-ignore -->
+                                                <option ng-repeat="r in roles">[[r]]</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <!-- submit button -->
+                                    <div class="row">
+                                        <div class="col-md-12 text-right">
+                                            <button
+                                                type="submit"
+                                                class="btn btn-success"
+                                                name="submit"
+                                            >
+                                                Submit
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                                <!-- success and error messages -->
+                                <div>
+                                    <!-- prettier-ignore -->
+                                    <p class="text-danger" ng-model="error_message">[[error_message]]</p>
+                                    <!-- prettier-ignore -->
+                                    <p class="text-success" ng-model="success_message">[[success_message]]</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-.clear {
-	clear: both;
-	height: 0;
-	line-height: 0;
-}
-
-.floatright {
-	float: right;
-}
-</style>
-								<div class="row">
-									<div class="col-md-12">
-										<div class="panel panel-default">
-											<div class="panel-heading ">Add a User</div>
-											<div class="panel-body">
-												<form name="addUserForm"
-													ng-submit="addUser(addUserForm.$valid)">
-													<b>Username:</b> <input type="text" name="username"
-														id="username" ng-model="user.username" /> <br>
-													<br> <b>Password:</b> <input type="password"
-														name="password" id="password" ng-model="user.password" />
-													<br>
-													<br> <b>Password (again):</b> <input type="password"
-														name="password2" id="password2" ng-model="user.password2" />
-													<br>
-													<br> <b>Role:</b> <select class="label" id="role"
-														name="role" ng-model="user.role" ng-init="Patient">
-														<option value="ROLE_PATIENT">Patient</option>
-														<option value="ROLE_HCP">Healthcare Provider</option>
-														<option value="ROLE_OD">Optometrist HCP</option>
-														<option value="ROLE_OPH">Ophthalmologist HCP</option>
-														<option value="ROLE_VIROLOGIST">Virologist HCP</option>
-														<option value="ROLE_ADMIN">Admin</option>
-														<option value="ROLE_ER">Emergency Responder</option>
-														<option value="ROLE_LABTECH">Lab Technician</option>
-														<option value="ROLE_PHARMACIST">Pharmacist</option>
-													</select> <br>
-													<br> <b>Enabled?:</b> <input type="checkbox"
-														name="enabled" class="checkbox" ng-model="user.enabled" />
-													<br> <input type="submit" id="submit" value="Add User" />
-												</form>
-												<div>
-													<p style="color: red" ng-model="errorAdding" id="errP">{{errorAdding}}</p>
-												</div>
-												<div>
-													<p style="color: green" ng-model="successMessage"
-														id="success">{{successMessage}}</p>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-</body>
+            <a href="/admin">Home</a>
+        </div>
+    </body>
 </html>
