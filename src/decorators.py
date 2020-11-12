@@ -19,8 +19,7 @@ def has_roles(roles, return_if_fail=DEFAULT_RETURN_IF_FAIL):
     :param return_if_fail: What to return if user not authorized
     """
     def role_wrapper(func):
-        wraps(func)
-
+        @wraps(func)
         def func_wrapper(*args, **kwargs):
             if session.get('role') in roles:
                 return func(*args, **kwargs)
