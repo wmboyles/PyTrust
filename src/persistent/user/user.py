@@ -1,6 +1,11 @@
+"""
+This file contains the User db model and marshmallow schema.
+
+:author William Boyles:
+"""
+
 from marshmallow.decorators import post_load
 from marshmallow_enum import EnumField
-from sqlalchemy.orm import validates
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from ..persistent import db, ma

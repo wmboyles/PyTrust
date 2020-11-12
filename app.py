@@ -1,6 +1,8 @@
 """
 This is the main file that creates and runs the app.
 It must be named app.py for the flask run command to work.
+
+:author William Boyles:
 """
 
 from flask import Flask
