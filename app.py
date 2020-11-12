@@ -10,6 +10,7 @@ import os
 import src.view_controllers.view_controller as view
 import src.api_controllers.api_controller as api
 import src.persistent.persistent as persistent
+import src.persistent.data_generator as data_generator
 
 
 def create_app(refresh_db=False):
@@ -42,8 +43,7 @@ def create_app(refresh_db=False):
     app.app_context().push()
 
     if refresh_db:
-        persistent.db.drop_all()
-        persistent.db.create_all()
+        data_generator.generate_sample_data()
 
     return app
 
