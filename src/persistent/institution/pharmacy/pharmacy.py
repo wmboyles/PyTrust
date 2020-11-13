@@ -31,7 +31,7 @@ class PharmacySchema(ma.SQLAlchemyAutoSchema):
     @post_load
     def make_pharmacy(self, data: dict, **kwargs) -> Pharmacy:
         """
-        This method is called when calling a lod. It transforms a dictionary
+        This method is called when calling a load. It transforms a dictionary
         representing the object into the object itself.
 
         :param data: Dict data representing pharmacy object
