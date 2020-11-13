@@ -9,6 +9,7 @@ apis.
 
 from .drug import api_drug_controller as drug
 from .user import api_user_controller as user
+from .state import api_state_controller as state
 
 # All api prefixes begin with /api
 BASE_URL = "/api"
@@ -17,4 +18,5 @@ BASE_URL = "/api"
 blueprints = {
     drug.api_drug_controller,
     user.api_user_controller,
+    state.api_state_controller,
 }
