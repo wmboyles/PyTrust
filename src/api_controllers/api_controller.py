@@ -9,7 +9,7 @@ apis.
 
 from .drug import api_drug_controller as drug
 from .user import api_user_controller as user
-from .pharmacy import api_pharmacy_controller as pharmacy
+from .institution.pharmacy import api_pharmacy_controller as pharmacy
 from .state import api_state_controller as state
 
 # All api prefixes begin with /api
