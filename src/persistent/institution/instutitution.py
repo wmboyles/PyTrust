@@ -1,21 +1,25 @@
-from marshmallow.decorators import post_load
-from marshmallow_enum import EnumField
+"""
+This file contains the abstract institution class, from which all instutions inherit.
+
+:author William Boyles:
+"""
+
 from sqlalchemy.orm import validates
 
-from ..persistent import db, ma
+from ..persistent import db
 from ..state.state import State
 
 
 class Institution(db.Model):
     """
-    A institution is a location where patients can get some of their healthcare needs met
+    An Institution is a location where patients can get some of their healthcare needs met
 
     :param id: Unique if in the database
-    :param name: name of pharmacy. Does not have to be unique
-    :param address: Street address of pharmacy
-    :param city: City where pharmacy is located
-    :param state: State where pharmacy is located
-    :param zip: Zip code where pharmacy is located
+    :param name: name of institution. Does not have to be unique
+    :param address: Street address of institution
+    :param city: City where institution is located
+    :param state: State where institution is located
+    :param zip: Zip code where institution is located
     """
     __abstract__ = True
 

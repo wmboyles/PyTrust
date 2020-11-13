@@ -1,7 +1,9 @@
 """
 This file contians class information on pharmacies, including the fields and
 methods a pharmacy has in the Pharmacy class, as well as how the pharmacy is
-serialized as JSON in PharmacySchema
+serialized as JSON in PharmacySchema.
+
+:author William Boyles:
 """
 
 from marshmallow.decorators import post_load

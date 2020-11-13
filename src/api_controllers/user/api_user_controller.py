@@ -1,6 +1,6 @@
 """
 This file contains API methods that relate to users.
-This included CRUD operations on user objects, as well as related things like
+This includes CRUD operations on user objects, as well as related things like
 getting a list of all user roles.
 
 :author William Boyles:
