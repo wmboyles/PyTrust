@@ -32,10 +32,6 @@ class Drug(db.Model):
     description = db.Column(db.String(1023), nullable=False)
     type = db.Column(db.Enum(DrugType), nullable=False)
 
-    # You only need @validates methods on fields where your column definitions
-    # are not sufficient. You don't need to check for None or type in these
-    # methods because that's handled by the oclumn definitions.
-
     @validates('code')
     def validate_code(self, key, code: str) -> str:
         """

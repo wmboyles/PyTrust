@@ -12,11 +12,11 @@ class UserRole(enum.Enum):
     A user role is an enum that describes what sort of user is logged in.
     Several views and API calls may be restricted to certain user roles.
     """
-    def __new__(cls, *args, **kwds):
+    def __new__(cls, *args, **kwargs):
         """
         Provides non-default way to construct UserRole.
         """
-        value = args[0]  # Gets by first attribe: role name
+        value = args[0]  # Gets by first attribute: role name
         obj = object.__new__(cls)
         obj._value_ = value
         return obj
