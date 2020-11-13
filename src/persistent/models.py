@@ -8,3 +8,4 @@ imports.
 
 from .drug import drug
 from .user import user
+from .institution.pharmacy import pharmacy
