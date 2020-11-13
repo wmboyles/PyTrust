@@ -1,244 +1,385 @@
-<html xmlns:th="http://www.thymeleaf.org">
-<head th:include="layout :: head(title=~{::title},links=~{})">
-<title>Request Appointment</title>
-</head>
-<body th:include="layout :: body" th:with="content=~{::content}">
-	<div th:fragment="content">
-		<script th::inline="javascript">
-		/* Otherwise Thymeleaf tries to parse Javascript as XML and breaks itself sometimes.  Sigh */
-		/*<![CDATA[*/
- 			var app = angular.module("manageHospitalsApp", []);
-			app.controller("manageHospitalsCtrl", function($scope, $http) {
-				
-				var checkValidHospitalForm = function(hospital) {
-					var err = [];
-					for(var i = 0; i < $scope.hospitals.length; i++) {
-						if(hospital.name === $scope.hospitals[i].name) {
-							err.push("A hospital with this name already exists");
-						}
-					}
-					if(!/(^\d{5}$)|(^\d{5}-\d{4}$)/.test(hospital.zip) ) {
-						err.push("zipcode must be 5 numbers");
-					}
-					if(hospital.name === "" || hospital.address === "" || hospital.state == ""
-					   || hospital.zip === "") {
-						err.push("Make sure no fields are empty");
-					}
-					return err.join(".  ");
-				}
-				
-		    $scope.hospitals = [];
-	        $scope.loadHospitals = function () {
-	          $http.get("/iTrust2/api/v1/hospitals").then(
-	            function (response) {
-	              $scope.hospitals = response.data;
-	              $scope.message = "";
-	            }, function (rejection) {
-	              $scope.hospitals = [];
-	              $scope.message = "Could not display users";
-	            });
-	        }
-	        
-	        $scope.addHospital = function () {
-		          var err = checkValidHospitalForm($scope.hospital);
-		          if (err) {
-		            $scope.errorAdding = err;
-		            $scope.successMessage = "";
-		          } else {
-		            $http.post("/iTrust2/api/v1/hospitals", $scope.hospital).then(
-		              function (response) {
-		            	    $scope.loadHospitals();
-		                $scope.hospital.name = "";
-		                $scope.hospital.address = "";
-		                $scope.hospital.state = "AL";
-		                $scope.hospital.zipcode = ""
-		                $scope.errorAdding = "";
-		                $scope.successMessage = "Hospital added successfully.";
-		              }, function (rejection) {
-		                $scope.errorAdding = "Could not add Hospital.";
-		                $scope.successMessage = "";
-		              });
-		          }
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Admin | Manage Hospitals</title>
+        <!-- Bootstrap import -->
+        <link
+            rel="stylesheet"
+            href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+        />
+        <!-- AngularJS import -->
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+        <!-- AngularJS code -->
+        <script>
+            var app = angular.module(
+                "managehospitalsApp",
+                [],
+                // Change the delimiter symbols to [[ and ]]
+                ($interpolateProvider) => {
+                    $interpolateProvider.startSymbol("[[");
+                    $interpolateProvider.endSymbol("]]");
+                }
+            );
+            app.controller("mangehospitalsCtrl", ($scope, $http) => {
+                // Is the hospital being edited or viewed?
+                $scope.get_template = (hospital) => {
+                    if (hospital.id === $scope.selected_hospital.id) {
+                        return "edit";
+                    } else {
+                        return "view";
+                    }
+                };
 
-		      }
-			
-	        $scope.deleteHospital = function(hospital) {
-	            $http.delete('/iTrust2/api/v1/hospitals/' + hospital.name).then(
-	              function (response) {
-	                $scope.loadHospitals();
-	              }, function (rejection) {
-	            	    $scope.loadHospitals();
-	                $scope.message = "Could not remove hospital";
-	              });
-	          }
+                // check that the hospital fields are valid
+                var check_hospital = (hospital) => {
+                    var err = [];
+                    if (!hospital.name) {
+                        err.push("hospital must have a name");
+                    }
+                    if (!hospital.address) {
+                        err.push("hospital must have an address");
+                    }
+                    if (!hospital.city) {
+                        err.push("hospital must have a city");
+                    }
+                    if (!hospital.state) {
+                        err.push("hospital must have a state");
+                    }
+                    if (!hospital.zip) {
+                        err.push("hospital must have a zip code");
+                    }
 
-	        $scope.getTemplate = function (hospital) {
-	          return 'view';
-	        };
-			
-		$scope.loadHospitals();
-		});
-			
-</script>
-		<div ng-app="manageHospitalsApp" ng-controller="manageHospitalsCtrl">
-			<div class="container">
-				<div class="row">
-					<div class="col-md-12">
-						<div class="panel panel-primary">
-							<div class="panel-heading">
-								<h3>Admin Manage Hospitals</h3>
-							</div>
-							<div class="panel-body">
-								<table class="table table-bordered">
-									<caption>Existing Hospitals:</caption>
-									<thead>
-										<tr>
-											<th>Hospital Name</th>
-											<th>Address</th>
-											<th>State</th>
-											<th>Zip Code</th>
-											<th>Delete Hospital</th>
-										</tr>
-									</thead>
-									<tbody>
-										<tr name="hospitalTableRow"
-											ng-repeat="h in hospitals | orderBy: 'name'"
-											ng-include=getTemplate(h) userId={{h.name}}>
-										</tr>
-									</tbody>
-								</table>
-								<!-- table in view mode -->
-								<script type="text/ng-template" id="view">
-                  console.log("test");
-                  <td name="nameCell">{{h.name}}</td>
-                  <td name="addressCell">{{h.address}}</td>
-                  <td name="stateCell">{{h.state}}</td>
-                  <td name="zipCell">{{h.zip}}</td>
-                  <td>
-                    <div class="row text-center">
-                      <div class="col-md-6">
-                          <input type="button" value="Delete" class="btn btn-danger" name="deleteHospital" ng-click="deleteHospital(h)"/>                          
-                      </div>
+                    return err.join(". ");
+                };
+
+                // load all hospitals from the DB
+                $scope.load_hospitals = () => {
+                    $http.get("/api/hospitals").then(
+                        (res) => {
+                            $scope.hospitals = res.data;
+                        },
+                        (err) => {
+                            $scope.hospitals = [];
+                        }
+                    );
+                };
+
+                // get list of states, territories
+                $scope.load_states = () => {
+                    $http.get("/api/states").then(
+                        (res) => {
+                            $scope.states = res.data;
+                        },
+                        (err) => {
+                            $scope.states = [];
+                        }
+                    );
+                };
+
+                // hospital edit operation is cancelled
+                $scope.reset_edit = () => {
+                    $scope.selected_hospital = {};
+                };
+
+                // hospital has been submitted
+                $scope.reset_create = () => {
+                    $scope.hospital = {};
+                };
+
+                // reset success and error messages
+                $scope.reset_messages = () => {
+                    $scope.error_message = "";
+                    $scope.success_message = "";
+                };
+
+                // when hospital is selected for editing
+                $scope.edit_hospital = (hospital) => {
+                    $scope.selected_hospital = angular.copy(hospital);
+                };
+
+                // hospital has been editing and should not be saved
+                $scope.save_hospital = () => {
+                    var err = check_hospital($scope.selected_hospital);
+                    if (err) {
+                        $scope.error_message = err;
+                        return;
+                    }
+
+                    $http.put("/api/hospitals", $scope.selected_hospital).then(
+                        (res) => {
+                            $scope.reset_edit();
+                            $scope.load_hospitals();
+                            $scope.error_message = "";
+                            $scope.success_message =
+                                "Successfully edited hospital";
+                        },
+                        (err) => {
+                            $scope.error_message = "" + err.data;
+                            $scope.success_message = "";
+                        }
+                    );
+                };
+
+                // hospital is being deleted
+                $scope.delete_hospital = (hospital) => {
+                    if (
+                        confirm(
+                            "Are you sure you want to delete this hospital?"
+                        )
+                    ) {
+                        $http.delete("/api/hospitals/" + hospital.id).then(
+                            (res) => {
+                                $scope.load_hospitals();
+                                $scope.error_message = "";
+                                $scope.success_message =
+                                    "Successfully deleted hospital";
+                            },
+                            (err) => {
+                                $scope.error_message = err.data;
+                                $scope.success_message = "";
+                            }
+                        );
+                    }
+                };
+
+                // a new hospital has been submitted for creation
+                $scope.add_hospital = () => {
+                    $http.post("/api/hospitals", $scope.hospital).then(
+                        (res) => {
+                            $scope.reset_create();
+                            $scope.load_hospitals();
+                            $scope.error_message = "";
+                            $scope.success_message =
+                                "Successfully created hospital";
+                        },
+                        (err) => {
+                            $scope.error_message = err.data;
+                            $scope.success_message = "";
+                        }
+                    );
+                };
+
+                // Runs on page load
+                $scope.reset_edit();
+                $scope.reset_create();
+                $scope.reset_messages();
+
+                $scope.load_hospitals();
+                $scope.load_states();
+            });
+        </script>
+    </head>
+    <body ng-app="managehospitalsApp" ng-controller="mangehospitalsCtrl">
+        <div class="container">
+            <div class="row">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h1>Admin Manage hospitals</h1>
                     </div>
-                  </td>
-                  /*]]>*/
-                </script>
+                    <div class="panel-body">
+                        <table class="table table-bordered">
+                            <caption>
+                                Existing hospitals
+                            </caption>
+                            <thead>
+                                <tr scope="row">
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Location</th>
+                                    <th scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr
+                                    ng-repeat="p in hospitals"
+                                    ng-include="get_template(p)"
+                                ></tr>
+                            </tbody>
+                        </table>
 
-								<style>
-form {
-	width: 400px;
-}
+                        <!-- table in view mode -->
+                        <script type="text/ng-template" id="view">
+                            <td scope="col">[[p.name]]</td>
+                            <td scope="col">[[p.address + " " + p.city + ", " + p.state + " " + p.zip]]</td>
+                            <td scope="col">
+                                <button class="col-md-6 btn btn-success" ng-click="edit_hospital(p)">Edit</button>
+                            	<button class="col-md-6 btn btn-danger" ng-click="delete_hospital(p)">Delete</button>
+                            </td>
+                        </script>
 
-.label {
-	float: right;
-	text-align: left;
-	width: 200px;
-	height: 20px;
-	color: #000000
-}
+                        <!-- table in edit mode -->
+                        <script type="text/ng-template" id="edit">
+                            <td scope="col">
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    ng-model="selected_hospital.name"
+                                    minlength="1"
+                                    maxlength="127">
+                            </td>
+                            <td scope="col">
+                                <div class="form-row">
+                                    <div class="form-group col-md-8">
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            ng-model="selected_hospital.address"
+                                            minlength="1"
+                                            maxlength="127">
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            ng-model="selected_hospital.city"
+                                            minlength="1"
+                                            maxlength="127">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-8">
+                                        <select
+                                            class="form-control"
+                                            ng-model="selected_hospital.state">
+                                            <option
+                                                ng-repeat="st in states"
+                                                ng-value="st[0]">[[ st[0] + " - " + st[1] ]]
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            ng-model="selected_hospital.zip"
+                                            minlength="1"
+                                            maxlength="5">
+                                    </div>
+                                </div>
+                            </td>
+                            <td scope="col">
+                                <button class="col-md-6 btn btn-success" ng-click="save_hospital()">Save</button>
+                            	<button class="col-md-6 btn btn-danger" ng-click="reset_edit()">Cancel</button>
+                            </td>
+                        </script>
 
-input[type=text] {
-	float: right;
-	text-align: left;
-	width: 200px;
-	height: 20px
-}
+                        <!-- create a new hospital, success and error messages -->
+                        <div class="panel panel-default">
+                            <div class="panel-heading">Add a hospital</div>
+                            <div class="panel-body">
+                                <!--- Create a new hospital form -->
+                                <form
+                                    role="form"
+                                    name="add_hospital_form"
+                                    ng-submit="add_hospital(add_hospital_form.$valid)"
+                                >
+                                    <!-- name and street address  -->
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label for="hospital_name"
+                                                >Name</label
+                                            >
+                                            <input
+                                                type="text"
+                                                class="form-control"
+                                                name="hospital_name"
+                                                ng-model="hospital.name"
+                                                minlength="1"
+                                                maxlength="127"
+                                                required
+                                            />
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label for="hospital_address"
+                                                >Address</label
+                                            >
+                                            <input
+                                                type="text"
+                                                class="form-control"
+                                                name="hospital_address"
+                                                ng-model="hospital.address"
+                                                minlength="1"
+                                                maxlength="127"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+                                    <!-- city, state, zip -->
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label for="hospital_city"
+                                                >City</label
+                                            >
+                                            <input
+                                                type="text"
+                                                class="form-control"
+                                                name="hospital_city"
+                                                ng-model="hospital.city"
+                                                minlength="1"
+                                                maxlength="127"
+                                                required
+                                            />
+                                        </div>
+                                        <div class="form-group col-md-4">
+                                            <label for="hospital_state"
+                                                >State</label
+                                            >
+                                            <select
+                                                name="hospital_state"
+                                                class="form-control"
+                                                ng-model="hospital.state"
+                                                required
+                                            >
+                                                <option value="">
+                                                    Select One
+                                                </option>
+                                                <!-- prettier-ignore -->
+                                                <option ng-repeat="st in states" ng-value="st[0]">[[ st[0] + " - " + st[1] ]]</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group col-md-2">
+                                            <label for="hospital_zip"
+                                                >Zip</label
+                                            >
+                                            <input
+                                                type="text"
+                                                class="form-control"
+                                                name="hospital_zip"
+                                                ng-model="hospital.zip"
+                                                minlength="1"
+                                                maxlength="5"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+                                    <!-- submit button -->
+                                    <div class="form-row">
+                                        <div
+                                            class="form-group col-md-12 text-right"
+                                        >
+                                            <button
+                                                type="submit"
+                                                class="btn btn-success"
+                                                name="submit"
+                                            >
+                                                Submit
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                                <!-- success and error messages -->
+                                <div>
+                                    <!-- prettier-ignore -->
+                                    <p class="text-danger" ng-model="error_message">[[error_message]]</p>
+                                    <!-- prettier-ignore -->
+                                    <p class="text-success" ng-model="success_message">[[success_message]]</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-.clear {
-	clear: both;
-	height: 0;
-	line-height: 0;
-}
-
-.floatright {
-	float: right;
-}
-</style>
-								<br>
-								<div class="row">
-									<div class="col-md-12">
-										<div class="panel panel-default">
-											<div class="panel-heading ">Add a Hospital</div>
-											<div class="panel-body">
-												<form name="addHospitalForm"
-													ng-submit="addHospital(addHospitalForm.$valid)">
-													<b>Name:</b> <input type="text" name="name" id="name"
-														ng-model="hospital.name" /> <br>
-													<br> <b>Address:</b> <input type="text" name="address"
-														id="address" ng-model="hospital.address" /> <br>
-													<br> <b>State:</b> <select class="label" id="state"
-														name="state" ng-model="hospital.state">
-														<option value="AL">Alabama</option>
-														<option value="AK">Alaska</option>
-														<option value="AZ">Arizona</option>
-														<option value="AR">Arkansas</option>
-														<option value="CA">California</option>
-														<option value="CO">Colorado</option>
-														<option value="CT">Connecticut</option>
-														<option value="DE">Delaware</option>
-														<option value="DC">District Of Columbia</option>
-														<option value="FL">Florida</option>
-														<option value="GA">Georgia</option>
-														<option value="HI">Hawaii</option>
-														<option value="ID">Idaho</option>
-														<option value="IL">Illinois</option>
-														<option value="IN">Indiana</option>
-														<option value="IA">Iowa</option>
-														<option value="KS">Kansas</option>
-														<option value="KY">Kentucky</option>
-														<option value="LA">Louisiana</option>
-														<option value="ME">Maine</option>
-														<option value="MD">Maryland</option>
-														<option value="MA">Massachusetts</option>
-														<option value="MI">Michigan</option>
-														<option value="MN">Minnesota</option>
-														<option value="MS">Mississippi</option>
-														<option value="MO">Missouri</option>
-														<option value="MT">Montana</option>
-														<option value="NE">Nebraska</option>
-														<option value="NV">Nevada</option>
-														<option value="NH">New Hampshire</option>
-														<option value="NJ">New Jersey</option>
-														<option value="NM">New Mexico</option>
-														<option value="NY">New York</option>
-														<option value="NC">North Carolina</option>
-														<option value="ND">North Dakota</option>
-														<option value="OH">Ohio</option>
-														<option value="OK">Oklahoma</option>
-														<option value="OR">Oregon</option>
-														<option value="PA">Pennsylvania</option>
-														<option value="RI">Rhode Island</option>
-														<option value="SC">South Carolina</option>
-														<option value="SD">South Dakota</option>
-														<option value="TN">Tennessee</option>
-														<option value="TX">Texas</option>
-														<option value="UT">Utah</option>
-														<option value="VT">Vermont</option>
-														<option value="VA">Virginia</option>
-														<option value="WA">Washington</option>
-														<option value="WV">West Virginia</option>
-														<option value="WI">Wisconsin</option>
-														<option value="WY">Wyoming</option>
-													</select> <br>
-													<br> <b>Zip Code:</b> <input type="text"
-														name="zipcode" id="zip" ng-model="hospital.zip" /> <br>
-													<br> <input type="submit" id="submit"
-														value="Add Hospital" />
-												</form>
-												<div>
-													<p style="color: red" ng-model="errorAdding" id="errP">{{errorAdding}}</p>
-												</div>
-												<div>
-													<p style="color: green" ng-model="successMessage"
-														id="success">{{successMessage}}</p>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-</body>
+            <a href="/admin">Home</a>
+        </div>
+    </body>
 </html>
