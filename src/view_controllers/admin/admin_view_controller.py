@@ -34,3 +34,9 @@ def manage_drugs():
 @has_roles(roles=['admin'], return_if_fail=RETURN_IF_FAIL)
 def manage_users():
     return render_template(BASE_FILE_URL + "users.html")
+
+
+@admin_view_controller.route("/pharmacies")
+@has_roles(roles=['admin'], return_if_fail=RETURN_IF_FAIL)
+def manage_pharmacies():
+    return render_template(BASE_FILE_URL + "pharmacies.html")

@@ -77,14 +77,18 @@ def edit_pharmacy():
     try:
         new_pharmacy = pharmacy_schema.load(json_data)
     except (AssertionError, ValidationError) as e:
+        print(json_data)
         return str(e), HTTPStatus.BAD_REQUEST
 
     old_pharmacy = Pharmacy.query.get(new_pharmacy.id)
     if old_pharmacy is None:
         return "No pharmacy with that id", HTTPStatus.NOT_FOUND
 
-    db.session.merge(new_pharmacy)
-    db.session.commit()
+    try:
+        db.session.merge(new_pharmacy)
+        db.session.commit()
+    except IntegrityError as e:
+        return "Already a pharmacy with that location", HTTPStatus.CONFLICT
 
     out_pharmacy = pharmacy_schema.dump(new_pharmacy)
     return out_pharmacy, HTTPStatus.OK
