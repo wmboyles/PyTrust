@@ -1,6 +1,9 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 
+# formatting / editor files
+.vscode/
+
 
 # Files that could contain secrets
 sql_learn.py
