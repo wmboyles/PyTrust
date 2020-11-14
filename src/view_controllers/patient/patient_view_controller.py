@@ -29,4 +29,4 @@ def home():
 @patient_view_controller.route("/demographics")
 @has_roles(roles=["patient"], return_if_fail=RETURN_IF_FAIL)
 def edit_demographics():
-    return render_template(BASE_FILE_URL + "demographics/editDemographics.html")
+    return render_template(BASE_FILE_URL + "editDemographics.html")
