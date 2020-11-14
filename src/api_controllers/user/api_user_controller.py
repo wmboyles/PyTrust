@@ -97,7 +97,7 @@ def edit_user():
 
 @api_user_controller.route("/users/<int:id>", methods=['DELETE'])
 @has_roles(roles=['admin'])
-def delete_user(id):
+def delete_user(id: int):
     """
     Deletes a user with a given id
 

@@ -32,7 +32,10 @@ class Patient(db.Model):
                         primary_key=True,
                         unique=True,
                         nullable=False)
-    user = db.relationship(User, backref='patient')
+    # if user is deleted by admin, so is the patient
+    user = db.relationship(User,
+                           backref=db.backref('patient',
+                                              cascade="all, delete-orphan"))
 
     first_name = db.Column(db.String(127), nullable=False)
     last_name = db.Column(db.String(127), nullable=False)
@@ -78,7 +81,6 @@ class PatientSchema(ma.SQLAlchemyAutoSchema):
     The patient schema helps with the serialization and deserializaton of patients.
     """
     class Meta:
-        include_fk = True
         model = Patient
 
     @post_load
