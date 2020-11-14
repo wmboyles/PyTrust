@@ -9,6 +9,7 @@ drug types.
 from flask import Blueprint, jsonify, request
 from http import HTTPStatus
 from marshmallow.exceptions import ValidationError
+from sqlalchemy.exc import IntegrityError
 
 from ...persistent.persistent import db
 from ...persistent.drug.drug import Drug, DrugSchema
@@ -57,8 +58,11 @@ def make_drug():
     if db_drug:
         return "Drug with that name already exists", HTTPStatus.CONFLICT
 
-    db.session.add(drug)
-    db.session.commit()
+    try:
+        db.session.add(drug)
+        db.session.commit()
+    except IntegrityError as e:
+        return "Combination of code and type must be unique", HTTPStatus.CONFLICT
 
     out_drug = drug_schema.dump(drug)
     # You only need to jsonify collections if you've used marshmallow shemas
@@ -84,9 +88,12 @@ def edit_drug():
     if old_drug is None:
         return "No drug with that id", HTTPStatus.NOT_FOUND
 
-    # merge existing and new, matched by id, keep new when differences
-    db.session.merge(new_drug)
-    db.session.commit()
+    try:
+        # merge existing and new, matched by id, keep new when differences
+        db.session.merge(new_drug)
+        db.session.commit()
+    except IntegrityError as e:
+        return "Combination of code and type must be unique", HTTPStatus.CONFLICT
 
     out_drug = drug_schema.dump(new_drug)
     return out_drug, HTTPStatus.OK

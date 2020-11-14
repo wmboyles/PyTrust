@@ -11,6 +11,8 @@ from marshmallow_enum import EnumField
 from sqlalchemy.orm import validates
 import re
 
+from sqlalchemy.sql.schema import UniqueConstraint
+
 from ..persistent import db, ma
 from .drug_type import DrugType
 
@@ -23,8 +25,12 @@ class Drug(db.Model):
     :param name: Unique chemical name.
     :param code: NDC code. Must be formatted "####-####-##"
     :param description: Longer description of the drug's properties
-    :param type: Type. Either Generic or Branded
+    :param type: Type. Either Generic or Branded.
+    
+    Combination of code and type should be unique.
     """
+
+    __table_args__ = (UniqueConstraint('code', 'type'), )
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(127), nullable=False, unique=True)
