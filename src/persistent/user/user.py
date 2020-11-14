@@ -29,7 +29,7 @@ class User(db.Model):
     password_hash = db.Column(db.String(255))
     role = db.Column(db.Enum(UserRole), nullable=False)
     '''
-    We want passwort to not ever be None, and we have length restrictions
+    We want password to not ever be None, and we have length restrictions
     because we didn't specify this in the column definition, we need to
     explitly check for None, type, and length. We wouldn't normally have to do
     this, but hashing passwords are a bit unique.
@@ -70,6 +70,3 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
 
     # Enums have to be done a bit more explicitly to serialize correctly
     role = EnumField(UserRole, by_value=True)
-
-    # include list of fields where you want to object rather than the key
-    # things = ma.Nested("ThingSchema")

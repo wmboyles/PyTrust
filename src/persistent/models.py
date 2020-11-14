@@ -7,6 +7,9 @@ imports.
 """
 
 from .drug import drug
+
 from .user import user
+from .user.patient import patient
+
 from .institution.pharmacy import pharmacy
 from .institution.hospital import hospital
