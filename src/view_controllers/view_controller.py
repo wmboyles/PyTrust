@@ -16,7 +16,7 @@ from .hcp import hcp_view_controller as hcp
 #from .labtech import labtech_view_controller as labtech
 from .patient import patient_view_controller as patient
 from .personnel import personnel_view_controller as personnel
-from .pharmacist import pharmacist_view_controller as pharmacist
+from .personnel.pharmacist import pharmacist_view_controller as pharmacist
 
 # Base URL is defined by each blueprint, but keeps consistency with API
 BASE_URL = None
