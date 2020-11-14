@@ -61,7 +61,7 @@
                     );
                 };
 
-                // load all the blood tyesp from the db
+                // load all the blood types from the db
                 $scope.load_blood_types = () => {
                     $http.get("/api/blood_types").then(
                         (res) => {
@@ -69,6 +69,18 @@
                         },
                         (err) => {
                             $scope.blood_types = [];
+                        }
+                    );
+                };
+
+                // load all the pharmacist from the db
+                $scope.load_pharmacies = () => {
+                    $http.get("/api/pharmacies").then(
+                        (res) => {
+                            $scope.pharmacies = res.data;
+                        },
+                        (err) => {
+                            $scope.pharmacies = [];
                         }
                     );
                 };
@@ -130,6 +142,7 @@
                 $scope.load_states();
                 $scope.load_drug_types();
                 $scope.load_blood_types();
+                $scope.load_pharmacies();
 
                 $scope.load_self();
             });
@@ -240,7 +253,7 @@
                             </div>
                             <!-- blood type, drug type, pharmacy -->
                             <div class="form-row">
-                                <div class="form-group col-md-6">
+                                <div class="form-group col-md-3">
                                     <label for="patient_blood_type"
                                         >Blood Type</label
                                     >
@@ -254,7 +267,7 @@
                                         <option ng-repeat="bt in blood_types">[[bt]]</option>
                                     </select>
                                 </div>
-                                <div class="form-group col-md-6">
+                                <div class="form-group col-md-3">
                                     <label for="patient_drug_type"
                                         >Drug Type</label
                                     >
@@ -266,6 +279,19 @@
                                         <option value="">Select One</option>
                                         <!-- prettier-ignore -->
                                         <option ng-repeat="dt in drug_types">[[dt]]</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="patient_pharmacy"
+                                        >Pharmacy</label
+                                    >
+                                    <select
+                                        class="form-control"
+                                        name="patient_pharmacy"
+                                        ng-model="patient.pharmacy"
+                                        ng-options="ph as (ph.name + ' - ' + ph.address + ' ' + ph.city + ', ' + ph.state + ' ' + ph.zip) for ph in pharmacies track by ph.id"
+                                    >
+                                        <option value="">Unspecified</option>
                                     </select>
                                 </div>
                             </div>

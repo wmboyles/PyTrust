@@ -9,6 +9,7 @@ from marshmallow_enum import EnumField
 from sqlalchemy.orm import validates
 
 from ..user import User, UserRole
+from ...institution.pharmacy.pharmacy import Pharmacy
 from ...persistent import db, ma
 from ....persistent.state.state import State
 from ....persistent.drug.drug_type import DrugType
@@ -20,15 +21,17 @@ class Patient(db.Model):
     A Patient contains more specific demographics information about users with the patient role.
 
     :param user_id: Unique database id. This is the same id as the associated user, because all user ids are
-    :param user: The associated user. This will be generally how the userid field is set, by specifying the entire user object
+    :param user: The associated user. This will be generally how the user_id field is set, by specifying the entire user object.
     :param first_name: patient's first name
     :param last_name: patient's last name
     :param address: patient's street address
     :param city: patient's city
     :param state: patient's state of residence
     :param zip: patient's zip code
-    :param drug_type: patient's preferred drugtype
     :param blood_type: patient's blood type
+    :param drug_type: patient's preferred drugtype
+    :param pharmacy_id: id of patient's preferred pharmacy
+    :param pharmacy: patient's preferred pharmacy. This will generally how the pharmacy_id field is set, by specifying the entire pharmacy object.
     """
 
     user_id = db.Column(
@@ -51,8 +54,11 @@ class Patient(db.Model):
     state = db.Column(db.Enum(State), nullable=False)
     zip = db.Column(db.Integer, nullable=False)
 
-    drug_type = db.Column(db.Enum(DrugType), nullable=True)
     blood_type = db.Column(db.Enum(BloodType), nullable=True)
+    drug_type = db.Column(db.Enum(DrugType), nullable=True)
+
+    pharmacy_id = db.Column(db.Integer, db.ForeignKey("pharmacy.id"), nullable=True)
+    pharmacy = db.relationship(Pharmacy, backref="patients")
 
     @validates("user")
     def validate_role(self, key, user: User) -> User:
@@ -99,6 +105,7 @@ class PatientSchema(ma.SQLAlchemyAutoSchema):
 
     # include list of fields where you want to object rather than the key
     user = ma.Nested("UserSchema")
+    pharmacy = ma.Nested("PharmacySchema")
 
     state = EnumField(State, by_value=True)
     drug_type = EnumField(DrugType, by_value=True)
