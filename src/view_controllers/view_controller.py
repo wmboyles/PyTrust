@@ -12,7 +12,7 @@ from .admin import admin_view_controller as admin
 #from .diseasecontrol import diseasecontrol_view_controller as diseasecontrol
 #from .er import er_view_controller as er
 #from .findexperts import findexperts_view_controller as findexperts
-from .hcp import hcp_view_controller as hcp
+from .personnel.hcp import hcp_view_controller as hcp
 #from .labtech import labtech_view_controller as labtech
 from .patient import patient_view_controller as patient
 from .personnel import personnel_view_controller as personnel
