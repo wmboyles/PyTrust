@@ -21,10 +21,6 @@
                 }
             );
             app.controller("editDemographicsCtrl", ($scope, $http) => {
-                var check_patient = (patient) => {
-                    // TODO
-                };
-
                 // load full patient object if it exists
                 // if not, load just the user object
                 $scope.load_self = () => {
@@ -55,12 +51,6 @@
 
                 // when submit button is pressed
                 $scope.submit_demographics = () => {
-                    var err = check_patient($scope.patient);
-                    if (err) {
-                        $scope.error_message = err;
-                        $scope.success_message = "";
-                    }
-
                     var fn = $http.post;
                     if ($scope.existing_patient) {
                         var fn = $http.put;
@@ -78,6 +68,38 @@
                             $scope.success_message = "";
                         }
                     );
+                };
+
+                // delete patient self
+                $scope.delete_self = () => {
+                    if (!$scope.existing_patient) {
+                        $scope.error_message =
+                            "You already don't have patient demographic information";
+                        $scope.success_message = "";
+                        return;
+                    }
+
+                    if (
+                        confirm(
+                            "Are you sure you want to delete your patient demographic information? You will still have an account, but all your office vists and prescriptions will be lost."
+                        )
+                    ) {
+                        $http
+                            .delete("/api/patients/" + $scope.patient.user.id)
+                            .then(
+                                (res) => {
+                                    $scope.error_message = "";
+                                    $scope.success_message =
+                                        "Successfully deleted patient demographic information";
+                                    $scope.load_self();
+                                },
+                                (err) => {
+                                    $scope.error_message =
+                                        "Could not delete patient demographic information";
+                                    $scope.success_message = "";
+                                }
+                            );
+                    }
                 };
 
                 $scope.load_states();
@@ -183,14 +205,24 @@
                                         minlength="1"
                                         maxlength="5"
                                         placeholder="#####"
-                                        pattern="[0-9]{5}"
+                                        pattern="[1-9][0-9]{4}"
                                         required
                                     />
                                 </div>
                             </div>
-                            <!-- submit button -->
+                            <!-- submit and delete button -->
                             <div class="form-row">
-                                <div class="col-md-12 text-right">
+                                <div class="col-md-6 text-left">
+                                    <button
+                                        type="button"
+                                        class="btn btn-danger"
+                                        name="delete"
+                                        ng-click="delete_self()"
+                                    >
+                                        Delete
+                                    </button>
+                                </div>
+                                <div class="col-md-6 text-right">
                                     <button
                                         type="submit"
                                         class="btn btn-success"

@@ -132,7 +132,7 @@ def edit_patient():
 
 
 @api_patient_controller.route("/patients/<int:id>", methods=["DELETE"])
-@has_roles(roles=["admin"])
+@has_roles(roles=["admin", "patient"])
 def delete_patient(id: int):
     """
     Deletes a patient with a given id
