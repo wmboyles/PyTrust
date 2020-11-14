@@ -8,8 +8,12 @@ from .persistent import db
 
 from .user.user_role import UserRole
 from .state.state import State
+
 from .user.user import User
 from .user.patient.patient import Patient
+
+from .institution.pharmacy.pharmacy import Pharmacy
+from .institution.hospital.hospital import Hospital
 
 # Password used when generating sample users
 DEFAULT_PASSWORD = "password"
@@ -24,6 +28,9 @@ def generate_sample_data():
 
     _generate_sample_users()
     _generate_patient()
+
+    _generate_pharmacy()
+    _generate_hospital()
 
 
 def _generate_sample_users():
@@ -52,7 +59,7 @@ def _generate_patient():
     patient = Patient()
     patient.first_name = "Some"
     patient.last_name = "Patient"
-    patient.address = "1234 Street Rd."
+    patient.address = "123 Patient St"
     patient.city = "Everytown"
     patient.state = State.NORTH_CAROLINA
     patient.zip = 12345
@@ -60,4 +67,36 @@ def _generate_patient():
 
     db.session.add(patient)
 
+    db.session.commit()
+
+
+def _generate_pharmacy():
+    """
+    Generates a pharmacy
+    """
+
+    p = Pharmacy()
+    p.name = "pharmacy"
+    p.address = "123 Pharmacy St"
+    p.city = "Everytown"
+    p.state = State.NORTH_CAROLINA
+    p.zip = 12345
+
+    db.session.add(p)
+    db.session.commit()
+
+
+def _generate_hospital():
+    """
+    Generates a hospital
+    """
+
+    h = Hospital()
+    h.name = "hospital"
+    h.address = "123 Hospitla St"
+    h.city = "Everytown"
+    h.state = State.NORTH_CAROLINA
+    h.zip = 12345
+
+    db.session.add(h)
     db.session.commit()
