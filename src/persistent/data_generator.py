@@ -31,12 +31,13 @@ def generate_sample_data():
     db.create_all()
 
     _generate_sample_users()
-    _generate_patient()
 
     _generate_pharmacy()
     _generate_hospital()
 
     _generate_drugs()
+
+    _generate_patient()
 
 
 def _generate_sample_users():
@@ -71,6 +72,7 @@ def _generate_patient():
     patient.zip = 12345
     patient.drug_type = DrugType.Generic
     patient.blood_type = BloodType.ONeg
+    patient.pharmacy = Pharmacy.query.one()
     patient.user = user
 
     db.session.add(patient)
