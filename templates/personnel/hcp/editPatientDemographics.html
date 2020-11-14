@@ -1,440 +1,258 @@
-<html xmlns:th="http://www.thymeleaf.org">
-  <head th:include="layout :: head(title=~{::title},links=~{::script})">
-    <title>Document Office Visit</title>
-    <script
-      th:src="@{/resources/js/dateTimeService.js}"
-      src="../resources/js/dateTimeService.js"
-    ></script>
-  </head>
-  <body th:include="layout :: body" th:with="content=~{::content}">
-    <div th:fragment="content">
-      <script th:inline="javascript">
-        /* Otherwise Thymeleaf tries to parse Javascript as XML and breaks itself sometimes.  Sigh */
-        /*<![CDATA[*/
-
-        var app = angular.module("myApp", ["dateTimeServices"]);
-        app.controller("editPatientDemographicsCtrl", function (
-          $scope,
-          $http,
-          dateTimeService
-        ) {
-          $scope.displayName = function (p) {
-            return (
-              p.firstName + " " + p.lastName + " (" + p.self.username + ")"
-            );
-          };
-
-          // documentation on Angular filters: https://docs.angularjs.org/api/ng/filter/filter
-          $scope.searchFilter = "";
-          $scope.filterPatients = function (patient) {
-            return $scope
-              .displayName(patient)
-              .toLowerCase()
-              .match($scope.searchFilter.toLowerCase());
-          };
-
-          function formDifferent(current, original) {
-            for (var field in original) {
-              if (current[field] != original[field]) return true;
-            }
-            return false;
-          }
-
-          $scope.originalForm = {};
-          $scope.patientForm = {};
-          $scope.selectPatient = function (patient, override) {
-            if (
-              !override &&
-              formDifferent($scope.patientForm, $scope.originalForm)
-            ) {
-              if (
-                !confirm(
-                  "You have made changes to " +
-                    $scope.patientForm.self +
-                    ". Would you like to continue? (changes will be lost)"
-                )
-              ) {
-                $scope.selectedPatient = "";
-                $scope.selectedPatient = $scope.patientForm.self;
-                return;
-              }
-            }
-
-            var pf = ($scope.patientForm = {});
-            var of = ($scope.originalForm = {});
-
-            // make a copy of the patient
-            for (var field in patient) {
-              if (field[0] == "$") continue; // don't mess with angular fields
-              pf[field] = of[field] = patient[field];
-            }
-            pf.dateOfBirth = new Date(of.dateOfBirth);
-            pf.self = of.self = patient.self.username;
-            // swap out enum id's for names
-            for (var i in $scope.states)
-              if (patient.state == $scope.states[i].id) {
-                pf.state = of.state = $scope.states[i].name;
-                break;
-              }
-            for (var i in $scope.bloodTypes)
-              if (patient.bloodType == $scope.bloodTypes[i].id) {
-                pf.bloodType = of.bloodType = $scope.bloodTypes[i].name;
-                break;
-              }
-            for (var i in $scope.ethnicities)
-              if (patient.ethnicity == $scope.ethnicities[i].id) {
-                pf.ethnicity = of.ethnicity = $scope.ethnicities[i].name;
-                break;
-              }
-            for (var i in $scope.genders)
-              if (patient.gender == $scope.genders[i].id) {
-                pf.gender = of.gender = $scope.genders[i].name;
-                break;
-              }
-            for (var i in $scope.drugTypes)
-              if (patient.drugType == $scope.drugTypes[i].id) {
-                pf.drugType = of.drugType = $scope.drugTypes[i].drugType;
-                break;
-              }
-
-            $scope.selectedPatient = pf.self;
-            pf.preferredPharmacyId = of.preferredPharmacyId =
-              patient.preferredPharmacy.id;
-          };
-
-          $http.get("/iTrust2/api/v1/patients").then(function (response) {
-            $scope.patients = response.data;
-          });
-
-          $http.get("/iTrust2/api/v1/state").then(function (response) {
-            $scope.states = response.data;
-          });
-
-          $http.get("/iTrust2/api/v1/bloodtype").then(function (response) {
-            $scope.bloodTypes = response.data;
-          });
-
-          $http.get("/iTrust2/api/v1/ethnicity").then(function (response) {
-            $scope.ethnicities = response.data;
-          });
-
-          $http.get("/iTrust2/api/v1/gender").then(function (response) {
-            $scope.genders = response.data;
-          });
-
-          $http.get("/iTrust2/api/v1/drugtype").then(function (response) {
-            $scope.drugTypes = response.data;
-          });
-
-          // Get all pharmacies
-          $http.get("/iTrust2/api/v1/pharmacies").then(function (response) {
-            $scope.pharmacies = response.data;
-          });
-
-          $scope.submit = function () {
-            var patient = angular.copy($scope.patientForm);
-            patient.dateOfBirth = dateTimeService.toDateString(
-              patient.dateOfBirth
-            );
-
-            // patient.preferredPharmacyId = patient.preferredPharmacy.id;
-
-            $http({
-              method: "PUT",
-              url: "/iTrust2/api/v1/patients/" + patient.self,
-              data: patient,
-            }).then(
-              function (response) {
-                $scope.message = "Patient demographics updated successfully.";
-
-                // replace the patient in session
-                for (var i in $scope.patients)
-                  if (
-                    $scope.patients[i].self.username ==
-                    response.data.self.username
-                  ) {
-                    $scope.patients[i] = response.data;
-                    $scope.selectPatient(response.data, true);
-                  }
-              },
-              function (rejection) {
-                if (rejection.data.msg) {
-                  $scope.message = "Error: " + rejection.data.msg;
-                } else {
-                  $scope.message = "An error occured updating demographics.";
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>HCP | Edit Patient Demographics</title>
+        <!-- Bootstrap import -->
+        <link
+            rel="stylesheet"
+            href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+        />
+        <!-- AngularJS import -->
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+        <!-- AngularJS code -->
+        <script>
+            var app = angular.module(
+                "editPatientDemographicsApp",
+                [],
+                // Change the delimiter symbols to [[ and ]]
+                ($interpolateProvider) => {
+                    $interpolateProvider.startSymbol("[[");
+                    $interpolateProvider.endSymbol("]]");
                 }
-              }
             );
-          };
-        });
+            app.factory("waitForLoadPatients", ($http) => {
+                var load_patients = () => {
+                    return $http.get("/api/patients").then(
+                        (res) => {
+                            return res.data;
+                        },
+                        (err) => {
+                            return [];
+                        }
+                    );
+                };
 
-        /*]]>*/
-      </script>
+                return { load_patients: load_patients };
+            });
+            app.controller(
+                "editPatientDemographicsCtrl",
+                ($scope, $http, waitForLoadPatients) => {
+                    // load all the states
+                    $scope.load_states = () => {
+                        $http.get("/api/states").then(
+                            (res) => {
+                                $scope.states = res.data;
+                            },
+                            (err) => {
+                                $scope.states = [];
+                            }
+                        );
+                    };
 
-      <div ng-app="myApp" ng-controller="editPatientDemographicsCtrl">
-        <div style="float: left; width: 30%; height: 75%; overflow-y: auto">
-          <h2>Patients:</h2>
-          <!-- info on filtering taken from here: https://www.w3schools.com/angular/angular_filters.asp
-				and https://docs.angularjs.org/api/ng/filter/filter -->
-          <h4>
-            Search: <input type="text" name="search" ng-model="searchFilter" />
-          </h4>
-          <!-- Info on scrolling taken from here: https://www.w3schools.com/cssref/pr_pos_overflow.asp -->
-          <!-- and here: https://stackoverflow.com/questions/9560330/how-to-hide-a-vertical-scroll-bar-when-not-needed -->
-          <ul style="overflow: auto;height=90%;">
-            <!-- Information on how labels wor from here: https://stackoverflow.com/questions/7863251/clicking-the-text-to-select-corresponding-radio-button -->
-            <li ng-repeat="patient in patients | filter:filterPatients">
-              <h4>
-                <label>
-                  <input
-                    type="radio"
-                    ng-model="$parent.selectedPatient"
-                    name="patient"
-                    value="{{patient.self.username}}"
-                    ng-click="$parent.selectPatient(patient)"
-                  />&nbsp;{{$parent.displayName(patient)}}
-                </label>
-              </h4>
-            </li>
-          </ul>
+                    // when submit button is pressed
+                    $scope.submit_demographics = () => {
+                        $http.put("/api/patients", $scope.patient).then(
+                            (res) => {
+                                $scope.error_message = "";
+                                $scope.success_message =
+                                    "Successfully updated patient demographics";
+
+                                $scope.patients = [];
+                                var patients_promise = waitForLoadPatients.load_patients();
+                                patients_promise.then((res2) => {
+                                    $scope.patients = res2;
+
+                                    for (var i in $scope.patients) {
+                                        if (
+                                            $scope.patients[i].user.id ===
+                                            res.data.user.id
+                                        ) {
+                                            $scope.patient = $scope.patients[i];
+                                        }
+                                    }
+                                });
+                            },
+                            (err) => {
+                                $scope.error_message = err.data;
+                                $scope.success_message = "";
+                            }
+                        );
+                    };
+
+                    // runs on page load
+                    $scope.load_states();
+                    var patients_promise = waitForLoadPatients.load_patients();
+                    patients_promise.then((res) => {
+                        $scope.patients = res;
+                    });
+                }
+            );
+        </script>
+    </head>
+    <body
+        ng-app="editPatientDemographicsApp"
+        ng-controller="editPatientDemographicsCtrl"
+    >
+        <div class="container">
+            <div class="row">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h1>HCP Edit Patient Demographics</h1>
+                    </div>
+                    <div class="panel-body">
+                        <!-- Select patient panel -->
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <div class="col-md-4"></div>
+                                <div class="col-md-4">
+                                    <label for="selected_patient"
+                                        >Patient</label
+                                    >
+                                    <select
+                                        class="form-control"
+                                        name="selected_patient"
+                                        ng-model="patient"
+                                        ng-options="p as (p.first_name + ' ' + p.last_name + ' (' + p.user.username + ')') for p in patients track by p.user.id"
+                                    >
+                                        <option value="">Select One</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4"></div>
+                            </div>
+                        </div>
+                        <!-- edit patient panel-->
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <form
+                                    class="form"
+                                    role="form"
+                                    name="edit_patient_demographics_form"
+                                    ng-submit="submit_demographics(edit_patient_demographics_form.$valid)"
+                                    ng-if="patient"
+                                >
+                                    <!-- first and last name -->
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label for="patient_first_name"
+                                                >First Name</label
+                                            >
+                                            <input
+                                                type="text"
+                                                class="form-control"
+                                                name="patient_first_name"
+                                                ng-model="patient.first_name"
+                                                minlength="1"
+                                                maxlength="127"
+                                                placeholder="First Name"
+                                                required
+                                            />
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label for="patient_last_name"
+                                                >Last Name</label
+                                            >
+                                            <input
+                                                type="text"
+                                                class="form-control"
+                                                name="patient_last_name"
+                                                ng-model="patient.last_name"
+                                                minlength="1"
+                                                maxlength="127"
+                                                placeholder="Last Name"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+                                    <!-- location fields -->
+                                    <div class="form-row">
+                                        <div class="form-group col-md-4">
+                                            <label for="patient_address"
+                                                >Address</label
+                                            >
+                                            <input
+                                                type="text"
+                                                class="form-control"
+                                                name="patient_address"
+                                                ng-model="patient.address"
+                                                minlength="1"
+                                                maxlength="127"
+                                                placeholder="Street Address"
+                                                required
+                                            />
+                                        </div>
+                                        <div class="form-group col-md-3">
+                                            <label for="patient_city"
+                                                >City</label
+                                            >
+                                            <input
+                                                type="text"
+                                                class="form-control"
+                                                name="patient_city"
+                                                ng-model="patient.city"
+                                                minlength="1"
+                                                maxlength="127"
+                                                placeholder="City"
+                                                required
+                                            />
+                                        </div>
+                                        <div class="form-group col-md-3">
+                                            <label for="patient_state"
+                                                >State</label
+                                            >
+                                            <select
+                                                class="form-control"
+                                                name="patient_state"
+                                                ng-model="patient.state"
+                                                required
+                                            >
+                                                <option value="">
+                                                    Select One
+                                                </option>
+                                                <!-- prettier-ignore -->
+                                                <option ng-repeat="st in states" ng-value="st[0]">[[ st[0] + " - " + st[1] ]]</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group col-md-2">
+                                            <label for="patient_zip">Zip</label>
+                                            <input
+                                                type="text"
+                                                class="form-control"
+                                                name="patient_zip"
+                                                ng-model="patient.zip"
+                                                minlength="1"
+                                                maxlength="5"
+                                                placeholder="#####"
+                                                pattern="[1-9][0-9]{4}"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+                                    <!-- submit button -->
+                                    <div class="form-row">
+                                        <div class="col-md-12 text-right">
+                                            <button
+                                                type="submit"
+                                                class="btn btn-success"
+                                                name="submit"
+                                            >
+                                                Submit
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <!-- success and error messages -->
+                        <div>
+                            <!-- prettier-ignore -->
+                            <p class="text-danger" ng-model="error_message">[[error_message]]</p>
+                            <!-- prettier-ignore -->
+                            <p class="text-success" ng-model="success_message">[[success_message]]</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <a href="/hcp">Home</a>
         </div>
-        <!-- information on vertical rule found here: https://stackoverflow.com/questions/571900/is-there-a-vr-vertical-rule-in-html  -->
-        <div
-          style="
-            float: left;
-            width: 70%;
-            border-left: 1px solid #bbb;
-            padding-left: 3%;
-            height: 75%;
-            overflow-y: auto;
-          "
-        >
-          <h2 id="header0">Edit Patient Demographics</h2>
-          <div ng-show="selectedPatient">
-            <h3>Username: {{selectedPatient}}</h3>
-            <table>
-              <!-- First Name -->
-              <tr>
-                <td style="text-align: right; padding: 5px">
-                  <b>First Name:</b>
-                </td>
-                <td>
-                  <input
-                    type="text"
-                    name="firstName"
-                    ng-model="patientForm.firstName"
-                  />
-                </td>
-              </tr>
-              <!-- Last Name -->
-              <tr>
-                <td style="text-align: right; padding: 5px">
-                  <b>Last Name:</b>
-                </td>
-                <td>
-                  <input
-                    type="text"
-                    name="lastName"
-                    ng-model="patientForm.lastName"
-                  />
-                </td>
-              </tr>
-              <!-- Preferred Name -->
-              <tr>
-                <td style="text-align: right; padding: 5px">
-                  <b>Preferred Name:</b>
-                </td>
-                <td>
-                  <input
-                    type="text"
-                    name="preferredName"
-                    ng-model="patientForm.preferredName"
-                  />
-                </td>
-              </tr>
-              <!-- Mother Username -->
-              <tr>
-                <td style="text-align: right; padding: 5px">
-                  <b>Mother (username):</b>
-                </td>
-                <td>
-                  <input
-                    type="text"
-                    name="mother"
-                    ng-model="patientForm.mother"
-                  />
-                </td>
-              </tr>
-              <!-- Father Username -->
-              <tr>
-                <td style="text-align: right; padding: 5px">
-                  <b>Father (username):</b>
-                </td>
-                <td>
-                  <input
-                    type="text"
-                    name="father"
-                    ng-model="patientForm.father"
-                  />
-                </td>
-              </tr>
-              <!-- Email -->
-              <tr>
-                <td style="text-align: right; padding: 5px"><b>Email:</b></td>
-                <td>
-                  <input
-                    type="text"
-                    name="email"
-                    ng-model="patientForm.email"
-                  />
-                </td>
-              </tr>
-              <!-- Address 1 -->
-              <tr>
-                <td style="text-align: right; padding: 5px">
-                  <b>Address Line 1:</b>
-                </td>
-                <td>
-                  <input
-                    type="text"
-                    name="address1"
-                    ng-model="patientForm.address1"
-                  />
-                </td>
-              </tr>
-              <!-- Address 2 -->
-              <tr>
-                <td style="text-align: right; padding: 5px">
-                  <b>Address Line 2:</b>
-                </td>
-                <td>
-                  <input
-                    type="text"
-                    name="address2"
-                    ng-model="patientForm.address2"
-                  />
-                </td>
-              </tr>
-              <!-- City -->
-              <tr>
-                <td style="text-align: right; padding: 5px"><b>City:</b></td>
-                <td>
-                  <input type="text" name="city" ng-model="patientForm.city" />
-                </td>
-              </tr>
-              <!-- State -->
-              <tr>
-                <td style="text-align: right; padding: 5px"><b>State:</b></td>
-                <td>
-                  <select name="state" ng-model="patientForm.state">
-                    <option ng-repeat="st in states">{{st.name}}</option>
-                  </select>
-                </td>
-              </tr>
-              <!-- Zip -->
-              <tr>
-                <td style="text-align: right; padding: 5px"><b>Zip:</b></td>
-                <td>
-                  <input type="text" name="zip" ng-model="patientForm.zip" />
-                </td>
-              </tr>
-              <!-- Phone -->
-              <tr>
-                <td style="text-align: right; padding: 5px"><b>Phone:</b></td>
-                <td>
-                  <input
-                    type="text"
-                    name="phone"
-                    ng-model="patientForm.phone"
-                  />
-                </td>
-              </tr>
-              <!-- Date of Birth -->
-              <tr>
-                <td style="text-align: right; padding: 5px">
-                  <b>Date of Birth:</b>
-                </td>
-                <td>
-                  <input
-                    type="date"
-                    name="dateOfBirth"
-                    ng-model="patientForm.dateOfBirth"
-                  />
-                </td>
-              </tr>
-              <!-- Blood Type -->
-              <tr>
-                <td style="text-align: right; padding: 5px">
-                  <b>Blood Type:</b>
-                </td>
-                <td>
-                  <select name="bloodType" ng-model="patientForm.bloodType">
-                    <option ng-repeat="bt in bloodTypes">{{bt.name}}</option>
-                  </select>
-                </td>
-              </tr>
-              <!-- Ethnicity -->
-              <tr>
-                <td style="text-align: right; padding: 5px">
-                  <b>Ethnicity:</b>
-                </td>
-                <td>
-                  <select name="ethnicity" ng-model="patientForm.ethnicity">
-                    <option ng-repeat="eth in ethnicities">{{eth.name}}</option>
-                  </select>
-                </td>
-              </tr>
-              <!-- Gender -->
-              <tr>
-                <td style="text-align: right; padding: 5px"><b>Gender:</b></td>
-                <td>
-                  <select name="gender" ng-model="patientForm.gender">
-                    <option ng-repeat="gen in genders">{{gen.name}}</option>
-                  </select>
-                </td>
-              </tr>
-              <!-- Preferred Drug Type -->
-              <tr>
-                <td style="text-align: left; padding: 5px">
-                  <b>Preferred Drug Type:</b>
-                </td>
-                <td>
-                  <select
-                    name="drugType"
-                    id="drugType"
-                    ng-model="patientForm.drugType"
-                  >
-                    <option ng-repeat="t in drugTypes">{{t.drugType}}</option>
-                  </select>
-                </td>
-              </tr>
-              <!-- Preferred Phamarmacy -->
-              <tr>
-                <td style="text-align: left; padding: 5px">
-                  <b>Preferred Pharmacy:</b>
-                </td>
-                <td>
-                  <select
-                    name="pharmacy"
-                    id="pharmacy"
-                    ng-model="patientForm.preferredPharmacyId"
-                  >
-                    <option value="">Not Specified</option>
-                    <option ng-repeat="ph in pharmacies" ng-value="{{ph.id}}">
-                      {{ph.name}}
-                    </option>
-                  </select>
-                </td>
-              </tr>
-            </table>
-
-            <br />
-            <button ng-click="submit()" name="submit">Submit</button>
-
-            <div name="success">{{message}}</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </body>
+    </body>
 </html>

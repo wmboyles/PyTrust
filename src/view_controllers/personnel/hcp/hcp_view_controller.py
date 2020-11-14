@@ -24,3 +24,9 @@ RETURN_IF_FAIL = redirect("/login")
 @has_roles(roles=["hcp"], return_if_fail=RETURN_IF_FAIL)
 def home():
     return render_template(BASE_FILE_URL + "index.html")
+
+
+@hcp_view_controller.route("/editpatientdemographics")
+@has_roles(roles=["hcp"], return_if_fail=RETURN_IF_FAIL)
+def edit_patient_demographics():
+    return render_template(BASE_FILE_URL + "editPatientDemographics.html")
