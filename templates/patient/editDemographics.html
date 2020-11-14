@@ -61,6 +61,18 @@
                     );
                 };
 
+                // load all the blood tyesp from the db
+                $scope.load_blood_types = () => {
+                    $http.get("/api/blood_types").then(
+                        (res) => {
+                            $scope.blood_types = res.data;
+                        },
+                        (err) => {
+                            $scope.blood_types = [];
+                        }
+                    );
+                };
+
                 // when submit button is pressed
                 $scope.submit_demographics = () => {
                     var fn = $http.post;
@@ -117,6 +129,8 @@
                 // runs on page load
                 $scope.load_states();
                 $scope.load_drug_types();
+                $scope.load_blood_types();
+
                 $scope.load_self();
             });
         </script>
@@ -226,7 +240,21 @@
                             </div>
                             <!-- blood type, drug type, pharmacy -->
                             <div class="form-row">
-                                <div class="form-group col-md-12">
+                                <div class="form-group col-md-6">
+                                    <label for="patient_blood_type"
+                                        >Blood Type</label
+                                    >
+                                    <select
+                                        class="form-control"
+                                        name="patient_blood_type"
+                                        ng-model="patient.blood_type"
+                                    >
+                                        <option value="">Unspecified</option>
+                                        <!-- prettier-ignore -->
+                                        <option ng-repeat="bt in blood_types">[[bt]]</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-md-6">
                                     <label for="patient_drug_type"
                                         >Drug Type</label
                                     >
