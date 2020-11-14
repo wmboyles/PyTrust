@@ -1,6 +1,7 @@
 """
 This file contains API methods that relate to states.
-This includes selected CRUD operations.
+
+:author William Boyles:
 """
 
 from flask import Blueprint, jsonify
@@ -18,7 +19,7 @@ api_state_controller = Blueprint(
 
 
 @api_state_controller.route("/states", methods=["GET"])
-def get_all_states_short():
+def get_all_states():
     """
     Gets a list of all states defined in the State enum.
     """
