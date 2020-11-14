@@ -1,5 +1,5 @@
 """
-This file contains API methods that relate the ethnicity.
+This file contains API methods that relate to ethnicity.
 
 :author William Boyles:
 """
