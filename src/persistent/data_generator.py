@@ -8,12 +8,15 @@ from .persistent import db
 
 from .user.user_role import UserRole
 from .state.state import State
+from .drug.drug_type import DrugType
 
 from .user.user import User
 from .user.patient.patient import Patient
 
 from .institution.pharmacy.pharmacy import Pharmacy
 from .institution.hospital.hospital import Hospital
+
+from .drug.drug import Drug
 
 # Password used when generating sample users
 DEFAULT_PASSWORD = "password"
@@ -31,6 +34,8 @@ def generate_sample_data():
 
     _generate_pharmacy()
     _generate_hospital()
+
+    _generate_drugs()
 
 
 def _generate_sample_users():
@@ -99,4 +104,22 @@ def _generate_hospital():
     h.zip = 12345
 
     db.session.add(h)
+    db.session.commit()
+
+
+def _generate_drugs():
+    dgn = Drug()
+    dgn.name = "GeneraDrug"
+    dgn.type = DrugType.Generic
+    dgn.code = "1234-5678-90"
+    dgn.description = "A generic drug"
+
+    dbr = Drug()
+    dbr.name = "BranDrug"
+    dbr.type = DrugType.Brand
+    dbr.code = "1234-5678-90"
+    dbr.description = "A brand drug"
+
+    db.session.add(dgn)
+    db.session.add(dbr)
     db.session.commit()
