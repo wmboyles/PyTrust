@@ -15,10 +15,10 @@ hcp_view_controller = Blueprint("hcp_view_controller",
                                 url_prefix="/hcp")
 
 BASE_FILE_URL = "hcp/"
+RETURN_IF_FAIL = redirect("/login")
 
 
 @hcp_view_controller.route("/")
-@has_roles(roles=['hcp', 'oph', 'od', 'virologist'],
-           return_if_fail=redirect("/login"))
+@has_roles(roles=['hcp'], return_if_fail=RETURN_IF_FAIL)
 def home():
     return render_template(BASE_FILE_URL + "index.html")
