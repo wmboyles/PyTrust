@@ -8,7 +8,6 @@ This includes CRUD operations on patient objects.
 from flask import Blueprint, jsonify, request, session
 from http import HTTPStatus
 from marshmallow.exceptions import ValidationError
-from sqlalchemy.exc import IntegrityError
 
 from ....persistent.persistent import db
 from ....persistent.user.patient.patient import Patient, PatientSchema
@@ -23,7 +22,7 @@ api_patient_controller = Blueprint("api_patient_controller",
 
 
 @api_patient_controller.route("/patients", methods=['GET'])
-@has_roles(roles=['hcp', 'er'])
+@has_roles(roles=['hcp'])
 def get_all_patients():
     """
     Gets a list of all patients in the DB
@@ -137,11 +136,10 @@ def delete_patient(id: int):
     """
     Deletes a patient with a given id
 
-    :param id: if of Patient in the db to delete
+    :param id: id of Patient in the db to delete
     """
 
     patient = Patient.query.get(id)
-
     if patient is None:
         return "No patient with that id", HTTPStatus.NOT_FOUND
 
