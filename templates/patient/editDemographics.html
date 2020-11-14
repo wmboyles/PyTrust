@@ -85,6 +85,17 @@
                     );
                 };
 
+                $scope.load_ethnicities = () => {
+                    $http.get("/api/ethnicities").then(
+                        (res) => {
+                            $scope.ethnicities = res.data;
+                        },
+                        (err) => {
+                            $scope.ethnicities = [];
+                        }
+                    );
+                };
+
                 // when submit button is pressed
                 $scope.submit_demographics = () => {
                     var fn = $http.post;
@@ -143,6 +154,7 @@
                 $scope.load_drug_types();
                 $scope.load_blood_types();
                 $scope.load_pharmacies();
+                $scope.load_ethnicities();
 
                 $scope.load_self();
             });
@@ -253,7 +265,21 @@
                             </div>
                             <!-- blood type, drug type, pharmacy -->
                             <div class="form-row">
-                                <div class="form-group col-md-3">
+                                <div class="form-group col-md-2">
+                                    <label for="patient_ethnicity"
+                                        >Ethnicity</label
+                                    >
+                                    <select
+                                        class="form-control"
+                                        name="patient_ethnicity"
+                                        ng-model="patient.ethnicity"
+                                    >
+                                        <option value="">Unspecified</option>
+                                        <!-- prettier-ignore -->
+                                        <option ng-repeat="eth in ethnicities">[[eth]]</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-md-2">
                                     <label for="patient_blood_type"
                                         >Blood Type</label
                                     >
@@ -267,7 +293,7 @@
                                         <option ng-repeat="bt in blood_types">[[bt]]</option>
                                     </select>
                                 </div>
-                                <div class="form-group col-md-3">
+                                <div class="form-group col-md-2">
                                     <label for="patient_drug_type"
                                         >Drug Type</label
                                     >

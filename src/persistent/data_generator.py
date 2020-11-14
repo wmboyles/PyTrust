@@ -10,6 +10,7 @@ from .user.user_role import UserRole
 from .state.state import State
 from .drug.drug_type import DrugType
 from .blood_type.blood_type import BloodType
+from .ethnicity.ethnicity import Ethnicity
 
 from .user.user import User
 from .user.patient.patient import Patient
@@ -70,6 +71,7 @@ def _generate_patient():
     patient.city = "Everytown"
     patient.state = State.NORTH_CAROLINA
     patient.zip = 12345
+    patient.ethnicity = Ethnicity.White
     patient.drug_type = DrugType.Generic
     patient.blood_type = BloodType.ONeg
     patient.pharmacy = Pharmacy.query.one()

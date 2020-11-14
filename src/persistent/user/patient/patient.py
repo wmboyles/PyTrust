@@ -14,6 +14,7 @@ from ...persistent import db, ma
 from ....persistent.state.state import State
 from ....persistent.drug.drug_type import DrugType
 from ....persistent.blood_type.blood_type import BloodType
+from ....persistent.ethnicity.ethnicity import Ethnicity
 
 
 class Patient(db.Model):
@@ -28,6 +29,7 @@ class Patient(db.Model):
     :param city: patient's city
     :param state: patient's state of residence
     :param zip: patient's zip code
+    :param ethnicity: patient's ethnicity
     :param blood_type: patient's blood type
     :param drug_type: patient's preferred drugtype
     :param pharmacy_id: id of patient's preferred pharmacy
@@ -54,6 +56,7 @@ class Patient(db.Model):
     state = db.Column(db.Enum(State), nullable=False)
     zip = db.Column(db.Integer, nullable=False)
 
+    ethnicity = db.Column(db.Enum(Ethnicity), nullable=True)
     blood_type = db.Column(db.Enum(BloodType), nullable=True)
     drug_type = db.Column(db.Enum(DrugType), nullable=True)
 
@@ -110,3 +113,4 @@ class PatientSchema(ma.SQLAlchemyAutoSchema):
     state = EnumField(State, by_value=True)
     drug_type = EnumField(DrugType, by_value=True)
     blood_type = EnumField(BloodType, by_value=True)
+    ethnicity = EnumField(Ethnicity, by_value=True)
