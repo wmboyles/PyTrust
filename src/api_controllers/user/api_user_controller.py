@@ -6,7 +6,7 @@ getting a list of all user roles.
 :author William Boyles:
 """
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, session
 from http import HTTPStatus
 from marshmallow.exceptions import ValidationError
 

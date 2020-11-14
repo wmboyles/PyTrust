@@ -5,7 +5,7 @@ This includes CRUD operations on patient objects.
 :author William Boyles:
 """
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, session
 from http import HTTPStatus
 from marshmallow.exceptions import ValidationError
 from sqlalchemy.exc import IntegrityError
@@ -23,7 +23,7 @@ api_patient_controller = Blueprint("api_patient_controller",
 
 
 @api_patient_controller.route("/patients", methods=['GET'])
-#@has_roles(roles=['hcp', 'er'])
+@has_roles(roles=['hcp', 'er'])
 def get_all_patients():
     """
     Gets a list of all patients in the DB
@@ -37,8 +37,35 @@ def get_all_patients():
     return jsonify(out_patients), HTTPStatus.OK
 
 
+@api_patient_controller.route("/patients/self", methods=['GET'])
+@has_roles(roles=['patient'])
+def get_self_patient():
+    """
+    If there is an existing patient object corresponding to the calling user, return it
+    """
+
+    caller_username = session.get('username', None)
+    if caller_username is None:
+        return "No username in client session", HTTPStatus.NOT_FOUND
+
+    calling_user = User.query.filter(User.username == caller_username).first()
+    calling_patient = Patient.query.filter(
+        Patient.user == calling_user).first()
+    if calling_patient is None:
+        user_schema = UserSchema()
+        out_user = user_schema.dump(calling_user)
+
+        # return user instead of patient
+        return out_user, HTTPStatus.NOT_FOUND
+
+    patient_schema = PatientSchema()
+    out_patient = patient_schema.dump(calling_patient)
+
+    return out_patient, HTTPStatus.OK
+
+
 @api_patient_controller.route("/patients", methods=['POST'])
-#@has_roles(roles=['patient'])
+@has_roles(roles=['patient'])
 def make_patient():
     """
     Creates a patient
@@ -76,8 +103,8 @@ def make_patient():
     return out_patient, HTTPStatus.OK
 
 
-@api_patient_controller.route("/users", methods=['PUT'])
-#@has_roles(roles=['hcp', 'patient'])
+@api_patient_controller.route("/patients", methods=['PUT'])
+@has_roles(roles=['hcp', 'patient'])
 def edit_patient():
     """
     Edits an existing patient
@@ -91,9 +118,11 @@ def edit_patient():
     except (AssertionError, ValidationError) as e:
         return str(e), HTTPStatus.BAD_REQUEST
 
-    old_patient = Patient.query.get(new_patient.user_id)
+    old_patient = Patient.query.get(new_patient.user.id)
     if old_patient is None:
         return "No patient with that id", HTTPStatus.NOT_FOUND
+
+    new_patient.user_id = new_patient.user.id
 
     db.session.merge(new_patient)
     db.session.commit()
@@ -103,6 +132,7 @@ def edit_patient():
 
 
 @api_patient_controller.route("/patients/<int:id>", methods=['DELETE'])
+@has_roles(roles=['admin'])
 def delete_patient(id: int):
     """
     Deletes a patient with a given id
