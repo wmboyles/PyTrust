@@ -12,6 +12,7 @@ from ..user import User, UserRole
 from ...persistent import db, ma
 from ....persistent.state.state import State
 from ....persistent.drug.drug_type import DrugType
+from ....persistent.blood_type.blood_type import BloodType
 
 
 class Patient(db.Model):
@@ -27,6 +28,7 @@ class Patient(db.Model):
     :param state: patient's state of residence
     :param zip: patient's zip code
     :param drug_type: patient's preferred drugtype
+    :param blood_type: patient's blood type
     """
 
     user_id = db.Column(
@@ -50,6 +52,7 @@ class Patient(db.Model):
     zip = db.Column(db.Integer, nullable=False)
 
     drug_type = db.Column(db.Enum(DrugType), nullable=True)
+    blood_type = db.Column(db.Enum(BloodType), nullable=True)
 
     @validates("user")
     def validate_role(self, key, user: User) -> User:
@@ -99,3 +102,4 @@ class PatientSchema(ma.SQLAlchemyAutoSchema):
 
     state = EnumField(State, by_value=True)
     drug_type = EnumField(DrugType, by_value=True)
+    blood_type = EnumField(BloodType, by_value=True)
