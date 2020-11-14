@@ -8,14 +8,16 @@ from http import HTTPStatus
 
 from ...persistent.state.state import State
 
-api_state_controller = Blueprint("api_state_controller",
-                                 __name__,
-                                 template_folder="templates",
-                                 static_folder="static",
-                                 url_prefix="/")
+api_state_controller = Blueprint(
+    "api_state_controller",
+    __name__,
+    template_folder="templates",
+    static_folder="static",
+    url_prefix="/",
+)
 
 
-@api_state_controller.route("/states", methods=['GET'])
+@api_state_controller.route("/states", methods=["GET"])
 def get_all_states_short():
     """
     Gets a list of all states defined in the State enum.

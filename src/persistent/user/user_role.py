@@ -12,6 +12,7 @@ class UserRole(enum.Enum):
     A user role is an enum that describes what sort of user is logged in.
     Several views and API calls may be restricted to certain user roles.
     """
+
     def __new__(cls, *args, **kwargs):
         """
         Provides non-default way to construct UserRole.
@@ -35,9 +36,9 @@ class UserRole(enum.Enum):
     PATIENT = "patient", "patient"
     HCP = "hcp", "hcp"
     ADMIN = "admin", "admin"
-    #ER = "er", "er"
-    #LABTECH = "labtech", "labtech"
-    #OD = "od", "hcp"
-    #OPH = "oph", "hcp"
-    #VIROLOGIST = "virologist", "hcp"
+    # ER = "er", "er"
+    # LABTECH = "labtech", "labtech"
+    # OD = "od", "hcp"
+    # OPH = "oph", "hcp"
+    # VIROLOGIST = "virologist", "hcp"
     PHARMACIST = "pharmacist", "pharmacist"

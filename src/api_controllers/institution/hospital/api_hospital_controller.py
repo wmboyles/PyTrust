@@ -14,15 +14,17 @@ from ....persistent.persistent import db
 from ....persistent.institution.hospital.hospital import Hospital, HospitalSchema
 from ....decorators import has_roles
 
-api_hospital_controller = Blueprint("api_hospital_controller",
-                                    __name__,
-                                    template_folder="templates",
-                                    static_folder="static",
-                                    url_prefix="/")
+api_hospital_controller = Blueprint(
+    "api_hospital_controller",
+    __name__,
+    template_folder="templates",
+    static_folder="static",
+    url_prefix="/",
+)
 
 
-@api_hospital_controller.route("/hospitals", methods=['GET'])
-@has_roles(roles=['admin', 'patient', 'hcp'])
+@api_hospital_controller.route("/hospitals", methods=["GET"])
+@has_roles(roles=["admin", "patient", "hcp"])
 def get_all_hospitals():
     """
     Gets a list of all hospitals in the DB
@@ -36,8 +38,8 @@ def get_all_hospitals():
     return jsonify(out_hospitals), HTTPStatus.OK
 
 
-@api_hospital_controller.route("/hospitals", methods=['POST'])
-@has_roles(roles=['admin', 'patient', 'hcp'])
+@api_hospital_controller.route("/hospitals", methods=["POST"])
+@has_roles(roles=["admin", "patient", "hcp"])
 def make_hospital():
     """
     Creates a hospital
@@ -45,7 +47,7 @@ def make_hospital():
 
     json_data = request.json
 
-    if json_data.get('id') is not None:
+    if json_data.get("id") is not None:
         return "Cannot assign hospital id", HTTPStatus.BAD_REQUEST
 
     hospital_schema = HospitalSchema()
@@ -64,8 +66,8 @@ def make_hospital():
     return out_hospital, HTTPStatus.OK
 
 
-@api_hospital_controller.route("/hospitals", methods=['PUT'])
-@has_roles(roles=['admin', 'patient', 'hcp'])
+@api_hospital_controller.route("/hospitals", methods=["PUT"])
+@has_roles(roles=["admin", "patient", "hcp"])
 def edit_hospital():
     """
     Edits an existing hospital
@@ -90,8 +92,8 @@ def edit_hospital():
     return out_hospital, HTTPStatus.OK
 
 
-@api_hospital_controller.route("/hospitals/<int:id>", methods=['DELETE'])
-@has_roles(roles=['admin', 'patient', 'hcp'])
+@api_hospital_controller.route("/hospitals/<int:id>", methods=["DELETE"])
+@has_roles(roles=["admin", "patient", "hcp"])
 def delete_hospital(id):
     """
     Deletes a hospital with a given id

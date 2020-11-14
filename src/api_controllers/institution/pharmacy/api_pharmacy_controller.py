@@ -14,15 +14,17 @@ from ....persistent.persistent import db
 from ....persistent.institution.pharmacy.pharmacy import Pharmacy, PharmacySchema
 from ....decorators import has_roles
 
-api_pharmacy_controller = Blueprint("api_pharmacy_controller",
-                                    __name__,
-                                    template_folder="templates",
-                                    static_folder="static",
-                                    url_prefix="/")
+api_pharmacy_controller = Blueprint(
+    "api_pharmacy_controller",
+    __name__,
+    template_folder="templates",
+    static_folder="static",
+    url_prefix="/",
+)
 
 
-@api_pharmacy_controller.route("/pharmacies", methods=['GET'])
-@has_roles(roles=['admin', 'patient', 'hcp', 'pharmacist'])
+@api_pharmacy_controller.route("/pharmacies", methods=["GET"])
+@has_roles(roles=["admin", "patient", "hcp", "pharmacist"])
 def get_all_pharmacies():
     """
     Gets a list of all pharmacies in the DB
@@ -36,8 +38,8 @@ def get_all_pharmacies():
     return jsonify(out_pharmacies), HTTPStatus.OK
 
 
-@api_pharmacy_controller.route("/pharmacies", methods=['POST'])
-@has_roles(roles=['admin', 'patient', 'hcp', 'pharmacist'])
+@api_pharmacy_controller.route("/pharmacies", methods=["POST"])
+@has_roles(roles=["admin", "patient", "hcp", "pharmacist"])
 def make_pharmacy():
     """
     Creates a pharmacy
@@ -45,7 +47,7 @@ def make_pharmacy():
 
     json_data = request.json
 
-    if json_data.get('id') is not None:
+    if json_data.get("id") is not None:
         return "Cannot assign pharmacy id", HTTPStatus.BAD_REQUEST
 
     pharmacy_schema = PharmacySchema()
@@ -64,8 +66,8 @@ def make_pharmacy():
     return out_pharmacy, HTTPStatus.OK
 
 
-@api_pharmacy_controller.route("/pharmacies", methods=['PUT'])
-@has_roles(roles=['admin', 'patient', 'hcp', 'pharmacist'])
+@api_pharmacy_controller.route("/pharmacies", methods=["PUT"])
+@has_roles(roles=["admin", "patient", "hcp", "pharmacist"])
 def edit_pharmacy():
     """
     Edits an existing pharmacy
@@ -94,8 +96,8 @@ def edit_pharmacy():
     return out_pharmacy, HTTPStatus.OK
 
 
-@api_pharmacy_controller.route("/pharmacies/<int:id>", methods=['DELETE'])
-@has_roles(roles=['admin', 'patient', 'hcp', 'pharmacist'])
+@api_pharmacy_controller.route("/pharmacies/<int:id>", methods=["DELETE"])
+@has_roles(roles=["admin", "patient", "hcp", "pharmacist"])
 def delete_pharmacy(id):
     """
     Deletes a pharmacy with a given id

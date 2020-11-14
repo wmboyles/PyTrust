@@ -8,11 +8,13 @@ from flask import Blueprint, render_template, redirect
 
 from ....decorators import has_roles
 
-pharmacist_view_controller = Blueprint("pharmacist_view_controller",
-                                       __name__,
-                                       template_folder="templates",
-                                       static_folder="static",
-                                       url_prefix="/pharmacist")
+pharmacist_view_controller = Blueprint(
+    "pharmacist_view_controller",
+    __name__,
+    template_folder="templates",
+    static_folder="static",
+    url_prefix="/pharmacist",
+)
 
 BASE_FILE_URL = "personnel/pharmacist/"
 

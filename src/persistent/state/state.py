@@ -13,6 +13,7 @@ class State(enum.Enum):
     This enum also includes several locations that are not technically US states
     but represent areas where a signifigant number of Americans live.
     """
+
     def __new__(cls, *args, **kwargs):
         """
         Provides a non-default way to construct a State.

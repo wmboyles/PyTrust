@@ -15,15 +15,17 @@ from ....persistent.user.user import User, UserSchema
 from ....persistent.user.user_role import UserRole
 from ....decorators import has_roles
 
-api_personnel_controller = Blueprint("api_personnel_controller",
-                                     __name__,
-                                     template_folder="templates",
-                                     static_folder="static",
-                                     url_prefix="/")
+api_personnel_controller = Blueprint(
+    "api_personnel_controller",
+    __name__,
+    template_folder="templates",
+    static_folder="static",
+    url_prefix="/",
+)
 
 
-@api_personnel_controller.route("/personnel/<string:type>", methods=['GET'])
-@has_roles(roles=['hcp', 'pharmacist'])
+@api_personnel_controller.route("/personnel/<string:type>", methods=["GET"])
+@has_roles(roles=["hcp", "pharmacist"])
 def get_all_personnel_by_type(type: str):
     try:
         role = UserRole(type)
@@ -39,20 +41,19 @@ def get_all_personnel_by_type(type: str):
     return jsonify(out), HTTPStatus.OK
 
 
-@api_personnel_controller.route("/personnel/self", methods=['GET'])
-@has_roles(roles=['hcp', 'pharmacist'])
+@api_personnel_controller.route("/personnel/self", methods=["GET"])
+@has_roles(roles=["hcp", "pharmacist"])
 def get_self_personnel():
     """
     If there is an existing personnel object correspodning to the calling user, return it
     """
 
-    caller_username = session.get('username', None)
+    caller_username = session.get("username", None)
     if caller_username is None:
         return "No username in client session", HTTPStatus.NOT_FOUND
 
     calling_user = User.query.filter(User.username == caller_username).first()
-    calling_personnel = Personnel.query.filter(
-        Personnel.user == calling_user).first()
+    calling_personnel = Personnel.query.filter(Personnel.user == calling_user).first()
     if calling_personnel is None:
         user_schema = UserSchema()
         out_user = user_schema.dump(calling_user)
@@ -66,8 +67,8 @@ def get_self_personnel():
     return out_personnel, HTTPStatus.OK
 
 
-@api_personnel_controller.route("/personnel", methods=['POST'])
-@has_roles(roles=['hcp', 'pharmacist'])
+@api_personnel_controller.route("/personnel", methods=["POST"])
+@has_roles(roles=["hcp", "pharmacist"])
 def make_personnel():
     """
     Creates a personnel
@@ -104,8 +105,8 @@ def make_personnel():
     return out_personnel, HTTPStatus.OK
 
 
-@api_personnel_controller.route("/personnel", methods=['PUT'])
-@has_roles(roles=['hcp', 'pharmacist'])
+@api_personnel_controller.route("/personnel", methods=["PUT"])
+@has_roles(roles=["hcp", "pharmacist"])
 def edit_personnel():
     """
     Edits an existing personnel
@@ -135,8 +136,8 @@ def edit_personnel():
     return out_personnel, HTTPStatus.OK
 
 
-@api_personnel_controller.route("/personnel/<int:id>", methods=['DELETE'])
-@has_roles(roles=['hcp', 'pharmacist'])
+@api_personnel_controller.route("/personnel/<int:id>", methods=["DELETE"])
+@has_roles(roles=["hcp", "pharmacist"])
 def delete_personnel(id: int):
     """
     Deletes a personnel with a given id

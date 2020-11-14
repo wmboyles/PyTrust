@@ -17,13 +17,14 @@ from ...state.state import State
 
 class Pharmacy(Institution):
     # Impose a unique constraint on combination of location fields
-    __table_args__ = (UniqueConstraint('address', 'city', 'state', 'zip'), )
+    __table_args__ = (UniqueConstraint("address", "city", "state", "zip"),)
 
 
 class PharmacySchema(ma.SQLAlchemyAutoSchema):
     """
     The pharmacy schema help with serialization and deserialization of pharmacies
     """
+
     class Meta:
         include_fk = True
         model = Pharmacy

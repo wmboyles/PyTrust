@@ -21,6 +21,7 @@ class Institution(db.Model):
     :param state: State where institution is located
     :param zip: Zip code where institution is located
     """
+
     __abstract__ = True
 
     id = db.Column(db.Integer, primary_key=True)
@@ -30,7 +31,7 @@ class Institution(db.Model):
     state = db.Column(db.Enum(State), nullable=False)
     zip = db.Column(db.Integer, nullable=False)
 
-    @validates('zip')
+    @validates("zip")
     def validate_zip(self, key, zip: int) -> int:
         """
         Validates that zip code field matches required pattern of five digits.

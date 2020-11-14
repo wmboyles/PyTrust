@@ -23,15 +23,17 @@ class Personnel(db.Model):
     visit, receiveprescriptions, etc.
     """
 
-    user_id = db.Column(db.Integer,
-                        db.ForeignKey('user.id'),
-                        primary_key=True,
-                        unique=True,
-                        nullable=False)
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        primary_key=True,
+        unique=True,
+        nullable=False,
+    )
     # if user is deleted by admin, so is the personnel
-    user = db.relationship(User,
-                           backref=db.backref('personnel',
-                                              cascade="all, delete-orphan"))
+    user = db.relationship(
+        User, backref=db.backref("personnel", cascade="all, delete-orphan")
+    )
 
     first_name = db.Column(db.String(127), nullable=False)
     last_name = db.Column(db.String(127), nullable=False)
@@ -41,17 +43,13 @@ class Personnel(db.Model):
     state = db.Column(db.Enum(State), nullable=False)
     zip = db.Column(db.Integer, nullable=False)
 
-    hospital_id = db.Column(db.Integer,
-                            db.ForeignKey('hospital.id'),
-                            nullable=True)
-    hospital = db.relationship(Hospital, backref='employees')
+    hospital_id = db.Column(db.Integer, db.ForeignKey("hospital.id"), nullable=True)
+    hospital = db.relationship(Hospital, backref="employees")
 
-    pharmacy_id = db.Column(db.Integer,
-                            db.ForeignKey('pharmacy.id'),
-                            nullable=True)
-    pharmacy = db.relationship(Pharmacy, backref='employees')
+    pharmacy_id = db.Column(db.Integer, db.ForeignKey("pharmacy.id"), nullable=True)
+    pharmacy = db.relationship(Pharmacy, backref="employees")
 
-    @validates('user')
+    @validates("user")
     def validate_role(self, key, user: User) -> User:
         """
         Validates that the associated user's role is not a patient or admin.
@@ -68,7 +66,7 @@ class Personnel(db.Model):
 
         return user
 
-    @validates('zip')
+    @validates("zip")
     def validate_zip(self, key, zip: int) -> int:
         """
         Validates that zip code field matches required pattern of five digits.
@@ -88,6 +86,7 @@ class PersonnelSchema(ma.SQLAlchemyAutoSchema):
     """
     The personnel schema help with the serialization and deserialization of personnel.
     """
+
     class Meta:
         model = Personnel
 

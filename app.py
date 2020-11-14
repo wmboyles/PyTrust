@@ -23,15 +23,17 @@ def create_app(refresh_db=False):
 
     app.secret_key = os.environ.get("SECRET_KEY")
 
-    app.config['DEBUG'] = (os.environ.get("DEBUG") == '1')
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = (
-        os.environ.get("SQLALCHEMY_TRACK_MODIFICATIONS") == '1')
+    app.config["DEBUG"] = os.environ.get("DEBUG") == "1"
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = (
+        os.environ.get("SQLALCHEMY_TRACK_MODIFICATIONS") == "1"
+    )
 
     db_user = os.environ.get("DB_USER")
     db_pass = os.environ.get("DB_PASS")
     db_name = os.environ.get("DB_NAME")
     app.config[
-        'SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{db_user}:{db_pass}@localhost/{db_name}"
+        "SQLALCHEMY_DATABASE_URI"
+    ] = f"mysql+pymysql://{db_user}:{db_pass}@localhost/{db_name}"
 
     persistent.db.init_app(app)
     persistent.ma.init_app(app)
@@ -52,5 +54,5 @@ def create_app(refresh_db=False):
 
 if __name__ == "__main__":
     app = create_app()
-    #app.run(ssl_context="adhoc")
+    # app.run(ssl_context="adhoc")
     app.run()

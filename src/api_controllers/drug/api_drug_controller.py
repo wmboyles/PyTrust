@@ -17,15 +17,17 @@ from ...persistent.drug.drug_type import DrugType
 from ...decorators import has_roles
 
 # Controller blueprint that's exported to parent module to be registered
-api_drug_controller = Blueprint("api_drug_controller",
-                                __name__,
-                                template_folder="templates",
-                                static_folder="static",
-                                url_prefix="/")
+api_drug_controller = Blueprint(
+    "api_drug_controller",
+    __name__,
+    template_folder="templates",
+    static_folder="static",
+    url_prefix="/",
+)
 
 
-@api_drug_controller.route("/drugs", methods=['GET'])
-@has_roles(roles=['admin', 'hcp', 'pharmacist'])
+@api_drug_controller.route("/drugs", methods=["GET"])
+@has_roles(roles=["admin", "hcp", "pharmacist"])
 def get_all_drugs():
     """
     Gets a list of all drugs in the database.
@@ -39,8 +41,8 @@ def get_all_drugs():
     return jsonify(out_drugs), HTTPStatus.OK
 
 
-@api_drug_controller.route("/drugs", methods=['POST'])
-@has_roles(roles=['admin'])
+@api_drug_controller.route("/drugs", methods=["POST"])
+@has_roles(roles=["admin"])
 def make_drug():
     """
     Creates a drug
@@ -69,8 +71,8 @@ def make_drug():
     return out_drug, HTTPStatus.OK
 
 
-@api_drug_controller.route("/drugs", methods=['PUT'])
-@has_roles(roles=['admin'])
+@api_drug_controller.route("/drugs", methods=["PUT"])
+@has_roles(roles=["admin"])
 def edit_drug():
     """
     Edits an existing drug
@@ -99,8 +101,8 @@ def edit_drug():
     return out_drug, HTTPStatus.OK
 
 
-@api_drug_controller.route("/drugs/<int:id>", methods=['DELETE'])
-@has_roles(roles=['admin'])
+@api_drug_controller.route("/drugs/<int:id>", methods=["DELETE"])
+@has_roles(roles=["admin"])
 def delete_drug(id):
     """
     Deletes a drug with a given id
@@ -119,8 +121,8 @@ def delete_drug(id):
     return "Successfully deleted drug", HTTPStatus.OK
 
 
-@api_drug_controller.route("/drug_types", methods=['GET'])
-@has_roles(roles=['admin', 'patient'])
+@api_drug_controller.route("/drug_types", methods=["GET"])
+@has_roles(roles=["admin", "patient"])
 def get_all_drug_types():
     """
     Gets a list of all drugtypes defined by the DrugType enum.

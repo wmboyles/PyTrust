@@ -28,20 +28,20 @@ class User(db.Model):
     # Although this field is required, we set it a bit differently b/c hashing
     password_hash = db.Column(db.String(255))
     role = db.Column(db.Enum(UserRole), nullable=False)
-    '''
+    """
     We want password to not ever be None, and we have length restrictions
     because we didn't specify this in the column definition, we need to
     explitly check for None, type, and length. We wouldn't normally have to do
     this, but hashing passwords are a bit unique.
-    '''
+    """
+
     def set_password(self, password: str) -> None:
         if not password:
             raise AssertionError("No password provided")
         if type(password) is not str:
             raise AssertionError("Password must be a string")
         if len(password) < 6 or len(password) > 255:
-            raise AssertionError(
-                "Password must be between 6 and 255 characters")
+            raise AssertionError("Password must be between 6 and 255 characters")
 
         self.password_hash = generate_password_hash(password)
 
@@ -53,6 +53,7 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
     """
     The user schema helps with the serialization and deserializaton of users.
     """
+
     class Meta:
         include_fk = True
         model = User

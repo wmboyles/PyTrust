@@ -17,13 +17,14 @@ from ...state.state import State
 
 class Hospital(Institution):
     # Impose a unique constraint on name
-    __table_args__ = (UniqueConstraint('name'), )
+    __table_args__ = (UniqueConstraint("name"),)
 
 
 class HospitalSchema(ma.SQLAlchemyAutoSchema):
     """
     The hospital schema help with serialization and deserialization of hospitals
     """
+
     class Meta:
         include_fk = True
         model = Hospital

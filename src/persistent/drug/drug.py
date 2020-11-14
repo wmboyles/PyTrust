@@ -26,11 +26,11 @@ class Drug(db.Model):
     :param code: NDC code. Must be formatted "####-####-##"
     :param description: Longer description of the drug's properties
     :param type: Type. Either Generic or Branded.
-    
+
     Combination of code and type should be unique.
     """
 
-    __table_args__ = (UniqueConstraint('code', 'type'), )
+    __table_args__ = (UniqueConstraint("code", "type"),)
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(127), nullable=False, unique=True)
@@ -38,7 +38,7 @@ class Drug(db.Model):
     description = db.Column(db.String(1023), nullable=False)
     type = db.Column(db.Enum(DrugType), nullable=False)
 
-    @validates('code')
+    @validates("code")
     def validate_code(self, key, code: str) -> str:
         """
         Validates that code field matches the required pattern.
@@ -53,7 +53,7 @@ class Drug(db.Model):
 
         return code
 
-    @validates('type')
+    @validates("type")
     def validate_type(self, key, dtype: DrugType) -> DrugType:
         """
         Validates that the drug type field is not unspecified.
@@ -64,8 +64,7 @@ class Drug(db.Model):
         """
 
         if dtype == DrugType.Not_Specified:
-            raise AssertionError(
-                "Drug type cannot be not specified for creating drugs")
+            raise AssertionError("Drug type cannot be not specified for creating drugs")
 
         return dtype
 
@@ -77,6 +76,7 @@ class DrugSchema(ma.SQLAlchemyAutoSchema):
     """
     The drug shema helps with serialization and deserialization of drugs.
     """
+
     class Meta:
         include_fk = True
         model = Drug

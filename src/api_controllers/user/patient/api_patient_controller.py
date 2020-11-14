@@ -14,15 +14,17 @@ from ....persistent.user.patient.patient import Patient, PatientSchema
 from ....persistent.user.user import User, UserSchema
 from ....decorators import has_roles
 
-api_patient_controller = Blueprint("api_patient_controller",
-                                   __name__,
-                                   template_folder="templates",
-                                   static_folder="static",
-                                   url_prefix="/")
+api_patient_controller = Blueprint(
+    "api_patient_controller",
+    __name__,
+    template_folder="templates",
+    static_folder="static",
+    url_prefix="/",
+)
 
 
-@api_patient_controller.route("/patients", methods=['GET'])
-@has_roles(roles=['hcp'])
+@api_patient_controller.route("/patients", methods=["GET"])
+@has_roles(roles=["hcp"])
 def get_all_patients():
     """
     Gets a list of all patients in the DB
@@ -36,20 +38,19 @@ def get_all_patients():
     return jsonify(out_patients), HTTPStatus.OK
 
 
-@api_patient_controller.route("/patients/self", methods=['GET'])
-@has_roles(roles=['patient'])
+@api_patient_controller.route("/patients/self", methods=["GET"])
+@has_roles(roles=["patient"])
 def get_self_patient():
     """
     If there is an existing patient object corresponding to the calling user, return it
     """
 
-    caller_username = session.get('username', None)
+    caller_username = session.get("username", None)
     if caller_username is None:
         return "No username in client session", HTTPStatus.NOT_FOUND
 
     calling_user = User.query.filter(User.username == caller_username).first()
-    calling_patient = Patient.query.filter(
-        Patient.user == calling_user).first()
+    calling_patient = Patient.query.filter(Patient.user == calling_user).first()
     if calling_patient is None:
         user_schema = UserSchema()
         out_user = user_schema.dump(calling_user)
@@ -63,8 +64,8 @@ def get_self_patient():
     return out_patient, HTTPStatus.OK
 
 
-@api_patient_controller.route("/patients", methods=['POST'])
-@has_roles(roles=['patient'])
+@api_patient_controller.route("/patients", methods=["POST"])
+@has_roles(roles=["patient"])
 def make_patient():
     """
     Creates a patient
@@ -102,8 +103,8 @@ def make_patient():
     return out_patient, HTTPStatus.OK
 
 
-@api_patient_controller.route("/patients", methods=['PUT'])
-@has_roles(roles=['hcp', 'patient'])
+@api_patient_controller.route("/patients", methods=["PUT"])
+@has_roles(roles=["hcp", "patient"])
 def edit_patient():
     """
     Edits an existing patient
@@ -130,8 +131,8 @@ def edit_patient():
     return out_patient, HTTPStatus.OK
 
 
-@api_patient_controller.route("/patients/<int:id>", methods=['DELETE'])
-@has_roles(roles=['admin'])
+@api_patient_controller.route("/patients/<int:id>", methods=["DELETE"])
+@has_roles(roles=["admin"])
 def delete_patient(id: int):
     """
     Deletes a patient with a given id
