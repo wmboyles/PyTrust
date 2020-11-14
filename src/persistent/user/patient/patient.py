@@ -11,6 +11,7 @@ from sqlalchemy.orm import validates
 from ..user import User, UserRole
 from ...persistent import db, ma
 from ....persistent.state.state import State
+from ....persistent.drug.drug_type import DrugType
 
 
 class Patient(db.Model):
@@ -25,6 +26,7 @@ class Patient(db.Model):
     :param city: patient's city
     :param state: patient's state of residence
     :param zip: patient's zip code
+    :param drug_type: patient's preferred drugtype
     """
 
     user_id = db.Column(
@@ -46,6 +48,8 @@ class Patient(db.Model):
     city = db.Column(db.String(127), nullable=False)
     state = db.Column(db.Enum(State), nullable=False)
     zip = db.Column(db.Integer, nullable=False)
+
+    drug_type = db.Column(db.Enum(DrugType), nullable=True)
 
     @validates("user")
     def validate_role(self, key, user: User) -> User:
@@ -92,4 +96,6 @@ class PatientSchema(ma.SQLAlchemyAutoSchema):
 
     # include list of fields where you want to object rather than the key
     user = ma.Nested("UserSchema")
+
     state = EnumField(State, by_value=True)
+    drug_type = EnumField(DrugType, by_value=True)

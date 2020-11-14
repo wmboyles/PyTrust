@@ -49,6 +49,18 @@
                     );
                 };
 
+                // load all the drug types from the db
+                $scope.load_drug_types = () => {
+                    $http.get("/api/drug_types").then(
+                        (res) => {
+                            $scope.drug_types = res.data;
+                        },
+                        (err) => {
+                            $scope.drug_types = [];
+                        }
+                    );
+                };
+
                 // when submit button is pressed
                 $scope.submit_demographics = () => {
                     var fn = $http.post;
@@ -102,7 +114,9 @@
                     }
                 };
 
+                // runs on page load
                 $scope.load_states();
+                $scope.load_drug_types();
                 $scope.load_self();
             });
         </script>
@@ -208,6 +222,23 @@
                                         pattern="[1-9][0-9]{4}"
                                         required
                                     />
+                                </div>
+                            </div>
+                            <!-- blood type, drug type, pharmacy -->
+                            <div class="form-row">
+                                <div class="form-group col-md-12">
+                                    <label for="patient_drug_type"
+                                        >Drug Type</label
+                                    >
+                                    <select
+                                        class="form-control"
+                                        name="patient_drug_type"
+                                        ng-model="patient.drug_type"
+                                    >
+                                        <option value="">Select One</option>
+                                        <!-- prettier-ignore -->
+                                        <option ng-repeat="dt in drug_types">[[dt]]</option>
+                                    </select>
                                 </div>
                             </div>
                             <!-- submit and delete button -->
