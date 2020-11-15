@@ -24,7 +24,12 @@
                 var load_patients = () => {
                     return $http.get("/api/patients").then(
                         (res) => {
-                            return res.data;
+                            var patients = res.data;
+                            for (var i in patients) {
+                                patients[i].dob = new Date(patients[i].dob);
+                            }
+
+                            return patients;
                         },
                         (err) => {
                             return [];
@@ -49,8 +54,72 @@
                         );
                     };
 
+                    // load all the drug types from the db
+                    $scope.load_drug_types = () => {
+                        $http.get("/api/drug_types").then(
+                            (res) => {
+                                $scope.drug_types = res.data;
+                            },
+                            (err) => {
+                                $scope.drug_types = [];
+                            }
+                        );
+                    };
+
+                    // load all the blood types from the db
+                    $scope.load_blood_types = () => {
+                        $http.get("/api/blood_types").then(
+                            (res) => {
+                                $scope.blood_types = res.data;
+                            },
+                            (err) => {
+                                $scope.blood_types = [];
+                            }
+                        );
+                    };
+
+                    // load all the pharmacist from the db
+                    $scope.load_pharmacies = () => {
+                        $http.get("/api/pharmacies").then(
+                            (res) => {
+                                $scope.pharmacies = res.data;
+                            },
+                            (err) => {
+                                $scope.pharmacies = [];
+                            }
+                        );
+                    };
+
+                    // load all the ethnicities from the db
+                    $scope.load_ethnicities = () => {
+                        $http.get("/api/ethnicities").then(
+                            (res) => {
+                                $scope.ethnicities = res.data;
+                            },
+                            (err) => {
+                                $scope.ethnicities = [];
+                            }
+                        );
+                    };
+
+                    // load all the genders from the db
+                    $scope.load_genders = () => {
+                        $http.get("/api/genders").then(
+                            (res) => {
+                                $scope.genders = res.data;
+                            },
+                            (err) => {
+                                $scope.genders = [];
+                            }
+                        );
+                    };
+
                     // when submit button is pressed
                     $scope.submit_demographics = () => {
+                        $scope.patient.dob = Intl.DateTimeFormat(
+                            "en-US"
+                        ).format($scope.patient.dob);
+
                         $http.put("/api/patients", $scope.patient).then(
                             (res) => {
                                 $scope.error_message = "";
@@ -81,6 +150,11 @@
 
                     // runs on page load
                     $scope.load_states();
+                    $scope.load_drug_types();
+                    $scope.load_blood_types();
+                    $scope.load_pharmacies();
+                    $scope.load_ethnicities();
+                    $scope.load_genders();
                     var patients_promise = waitForLoadPatients.load_patients();
                     patients_promise.then((res) => {
                         $scope.patients = res;
@@ -130,9 +204,9 @@
                                     ng-submit="submit_demographics(edit_patient_demographics_form.$valid)"
                                     ng-if="patient"
                                 >
-                                    <!-- first and last name -->
+                                    <!-- first last name, dob -->
                                     <div class="form-row">
-                                        <div class="form-group col-md-6">
+                                        <div class="form-group col-md-4">
                                             <label for="patient_first_name"
                                                 >First Name</label
                                             >
@@ -147,7 +221,7 @@
                                                 required
                                             />
                                         </div>
-                                        <div class="form-group col-md-6">
+                                        <div class="form-group col-md-4">
                                             <label for="patient_last_name"
                                                 >Last Name</label
                                             >
@@ -159,6 +233,18 @@
                                                 minlength="1"
                                                 maxlength="127"
                                                 placeholder="Last Name"
+                                                required
+                                            />
+                                        </div>
+                                        <div class="form-group col-md-4">
+                                            <label for="patient_dob"
+                                                >Date of Birth</label
+                                            >
+                                            <input
+                                                type="date"
+                                                class="form-control"
+                                                name="patient_dob"
+                                                ng-model="patient.dob"
                                                 required
                                             />
                                         </div>
@@ -225,6 +311,105 @@
                                                 pattern="[1-9][0-9]{4}"
                                                 required
                                             />
+                                        </div>
+                                    </div>
+                                    <!-- email, gender, ethnicity, blood type, drug type -->
+                                    <div class="form-row">
+                                        <div class="form-group col-md-3">
+                                            <label for="patient_email"
+                                                >Email</label
+                                            >
+                                            <input
+                                                type="email"
+                                                name="patient_email"
+                                                class="form-control"
+                                                ng-model="patient.email"
+                                                minlength="1"
+                                                maxlength="127"
+                                                placeholder="Email"
+                                            />
+                                        </div>
+                                        <div class="form-group col-md-3">
+                                            <label for="patient_gender"
+                                                >Gender</label
+                                            >
+                                            <select
+                                                class="form-control"
+                                                name="patient_gender"
+                                                ng-model="patient.gender"
+                                            >
+                                                <option value="">
+                                                    Unspecified
+                                                </option>
+                                                <!-- prettier-ignore -->
+                                                <option ng-repeat="gen in genders">[[gen]]</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group col-md-3">
+                                            <label for="patient_ethnicity"
+                                                >Ethnicity</label
+                                            >
+                                            <select
+                                                class="form-control"
+                                                name="patient_ethnicity"
+                                                ng-model="patient.ethnicity"
+                                            >
+                                                <option value="">
+                                                    Unspecified
+                                                </option>
+                                                <!-- prettier-ignore -->
+                                                <option ng-repeat="eth in ethnicities">[[eth]]</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group col-md-3">
+                                            <label for="patient_blood_type"
+                                                >Blood Type</label
+                                            >
+                                            <select
+                                                class="form-control"
+                                                name="patient_blood_type"
+                                                ng-model="patient.blood_type"
+                                            >
+                                                <option value="">
+                                                    Unspecified
+                                                </option>
+                                                <!-- prettier-ignore -->
+                                                <option ng-repeat="bt in blood_types">[[bt]]</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <!-- pharmacy -->
+                                    <div class="form-row">
+                                        <div class="form-group col-md-4">
+                                            <label for="patient_drug_type"
+                                                >Drug Type</label
+                                            >
+                                            <select
+                                                class="form-control"
+                                                name="patient_drug_type"
+                                                ng-model="patient.drug_type"
+                                            >
+                                                <option value="">
+                                                    Select One
+                                                </option>
+                                                <!-- prettier-ignore -->
+                                                <option ng-repeat="dt in drug_types">[[dt]]</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group col-md-8">
+                                            <label for="patient_pharmacy"
+                                                >Pharmacy</label
+                                            >
+                                            <select
+                                                class="form-control"
+                                                name="patient_pharmacy"
+                                                ng-model="patient.pharmacy"
+                                                ng-options="ph as (ph.name + ' - ' + ph.address + ' ' + ph.city + ', ' + ph.state + ' ' + ph.zip) for ph in pharmacies track by ph.id"
+                                            >
+                                                <option value="">
+                                                    Unspecified
+                                                </option>
+                                            </select>
                                         </div>
                                     </div>
                                     <!-- submit button -->

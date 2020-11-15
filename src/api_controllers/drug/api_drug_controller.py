@@ -122,7 +122,7 @@ def delete_drug(id):
 
 
 @api_drug_controller.route("/drug_types", methods=["GET"])
-@has_roles(roles=["admin", "patient"])
+@has_roles(roles=["admin", "patient", "hcp"])
 def get_all_drug_types():
     """
     Gets a list of all drugtypes defined by the DrugType enum.

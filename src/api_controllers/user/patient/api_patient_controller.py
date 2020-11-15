@@ -112,8 +112,6 @@ def edit_patient():
 
     json_data = request.json
 
-    print(json_data)
-
     patient_schema = PatientSchema()
     try:
         new_patient = patient_schema.load(json_data)
