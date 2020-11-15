@@ -1,46 +1,17 @@
-{% extends 'base.html' %}
+{% extends 'simple_messages.html' %}
 
 <!-- page content -->
-{% block content %}
-<div class="panel panel-primary">
-    <div class="panel-heading">
-        <h1>{{page_heading}}</h1>
-    </div>
-    <div class="panel-body">
-        {% block table_template %}{% endblock %}
-        <table class="table table-bordered">
-            <caption>
-                {{table_caption}}
-            </caption>
-            <thead>
-                <tr scope="row">
-                    {% block table_headings %}{% endblock %}
-                </tr>
-            </thead>
-            <tbody>
-                {% block table_body %}{% endblock %}
-            </tbody>
-        </table>
+{% block panel_content %}
+<!-- table template -->
+{% block table_template %}{% endblock %}
+<!-- table in view mode -->
+{% block table_view %}{% endblock %}
+<!-- table in edit mode -->
+{% block table_edit %}{% endblock %}
 
-        <!-- table in view mode -->
-        {% block table_view %}{% endblock %}
-        <!-- table in edit mode -->
-        {% block table_edit %}{% endblock %}
-
-        <!-- area containing form to create whatever is in table-->
-        <div class="panel panel-default">
-            <div class="panel-heading">{{create_heading}}</div>
-            <div class="panel-body">
-                {% block create_form %}{% endblock %}
-                <!-- success and error messages -->
-                <div>
-                    <!-- prettier-ignore -->
-                    <p class="text-danger" ng-model="error_message">[[error_message]]</p>
-                    <!-- prettier-ignore -->
-                    <p class="text-success" ng-model="success_message">[[success_message]]</p>
-                </div>
-            </div>
-        </div>
-    </div>
+<!-- area containing form to create whatever is in table-->
+<div class="panel panel-default">
+    <div class="panel-heading">{{create_heading}}</div>
+    <div class="panel-body">{% block create_form %}{% endblock %}</div>
 </div>
 {% endblock %}

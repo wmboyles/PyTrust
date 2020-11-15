@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+<!-- page content -->
+{% block content %}
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h1>{{page_heading}}</h1>
+    </div>
+    <div class="panel-body">
+        {% block panel_content %}{% endblock %}
+        <!-- success and error messages -->
+        <div>
+            <!-- prettier-ignore -->
+            <p class="text-danger" ng-model="error_message">[[error_message]]</p>
+            <!-- prettier-ignore -->
+            <p class="text-success" ng-model="success_message">[[success_message]]</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
