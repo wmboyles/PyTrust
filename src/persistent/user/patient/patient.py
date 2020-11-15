@@ -4,6 +4,7 @@ This file contains the Patient db model and marshmallow schema
 :author William Boyles:
 """
 
+from marshmallow import fields
 from marshmallow.decorators import post_load
 from marshmallow_enum import EnumField
 from sqlalchemy.orm import validates
@@ -26,10 +27,12 @@ class Patient(db.Model):
     :param user: The associated user. This will be generally how the user_id field is set, by specifying the entire user object.
     :param first_name: patient's first name
     :param last_name: patient's last name
+    :param dob: patient's date of birth
     :param address: patient's street address
     :param city: patient's city
     :param state: patient's state of residence
     :param zip: patient's zip code
+    :param email: patient's email address
     :param gender: patient's gender
     :param ethnicity: patient's ethnicity
     :param blood_type: patient's blood type
@@ -53,10 +56,14 @@ class Patient(db.Model):
     first_name = db.Column(db.String(127), nullable=False)
     last_name = db.Column(db.String(127), nullable=False)
 
+    dob = db.Column(db.DateTime, nullable=False)
+
     address = db.Column(db.String(127), nullable=False)
     city = db.Column(db.String(127), nullable=False)
     state = db.Column(db.Enum(State), nullable=False)
     zip = db.Column(db.Integer, nullable=False)
+
+    email = db.Column(db.String(127), nullable=False)
 
     gender = db.Column(db.Enum(Gender), nullable=True)
     ethnicity = db.Column(db.Enum(Ethnicity), nullable=True)
@@ -111,7 +118,8 @@ class PatientSchema(ma.SQLAlchemyAutoSchema):
 
     # include list of fields where you want to object rather than the key
     user = ma.Nested("UserSchema")
-    pharmacy = ma.Nested("PharmacySchema")
+    dob = fields.Date(format="%m/%d/%Y")
+    pharmacy = ma.Nested("PharmacySchema", allow_none=True)
 
     state = EnumField(State, by_value=True)
     drug_type = EnumField(DrugType, by_value=True)

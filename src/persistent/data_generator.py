@@ -3,6 +3,7 @@ This file generates sample data in the database
 
 :author William Boyles:
 """
+from datetime import datetime
 
 from .persistent import db
 
@@ -68,10 +69,12 @@ def _generate_patient():
     patient = Patient()
     patient.first_name = "Some"
     patient.last_name = "Patient"
+    patient.dob = datetime(day=29, month=2, year=2000)
     patient.address = "123 Patient St"
     patient.city = "Everytown"
     patient.state = State.NORTH_CAROLINA
     patient.zip = 12345
+    patient.email = "some_patient@email.com"
     patient.gender = Gender.Male
     patient.ethnicity = Ethnicity.White
     patient.drug_type = DrugType.Generic

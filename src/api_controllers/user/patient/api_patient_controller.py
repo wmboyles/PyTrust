@@ -112,11 +112,13 @@ def edit_patient():
 
     json_data = request.json
 
+    print(json_data)
+
     patient_schema = PatientSchema()
     try:
         new_patient = patient_schema.load(json_data)
     except (AssertionError, ValidationError) as e:
-        return str(e), HTTPStatus.BAD_REQUEST
+        return repr(e), HTTPStatus.BAD_REQUEST
 
     old_patient = Patient.query.get(new_patient.user.id)
     if old_patient is None:

@@ -26,7 +26,10 @@
                 $scope.load_self = () => {
                     $http.get("/api/patients/self").then(
                         (res) => {
-                            $scope.patient = res.data;
+                            var patient = res.data;
+                            patient.dob = new Date(patient.dob);
+                            $scope.patient = patient;
+
                             $scope.existing_patient = true;
                         },
                         (err) => {
@@ -111,6 +114,14 @@
 
                 // when submit button is pressed
                 $scope.submit_demographics = () => {
+                    // // {
+                    //     month: "2-digit",
+                    //     day: "2-digit",
+                    //     year: "numeric",
+                    // }
+                    $scope.patient.dob = Intl.DateTimeFormat("en-US").format(
+                        $scope.patient.dob
+                    );
                     var fn = $http.post;
                     if ($scope.existing_patient) {
                         var fn = $http.put;
@@ -183,14 +194,13 @@
                     </div>
                     <div class="panel-body">
                         <form
-                            class="form"
                             role="form"
                             name="patient_demographics_form"
                             ng-submit="submit_demographics(patient_demographics_form.$valid)"
                         >
-                            <!-- first and last name -->
+                            <!-- first last name, dob -->
                             <div class="form-row">
-                                <div class="form-group col-md-6">
+                                <div class="form-group col-md-4">
                                     <label for="patient_first_name"
                                         >First Name</label
                                     >
@@ -205,7 +215,7 @@
                                         required
                                     />
                                 </div>
-                                <div class="form-group col-md-6">
+                                <div class="form-group col-md-4">
                                     <label for="patient_last_name"
                                         >Last Name</label
                                     >
@@ -217,6 +227,18 @@
                                         minlength="1"
                                         maxlength="127"
                                         placeholder="Last Name"
+                                        required
+                                    />
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label for="patient_dob"
+                                        >Date of Birth</label
+                                    >
+                                    <input
+                                        type="date"
+                                        class="form-control"
+                                        name="patient_dob"
+                                        ng-model="patient.dob"
                                         required
                                     />
                                 </div>
@@ -277,10 +299,19 @@
                                     />
                                 </div>
                             </div>
-                            <!-- gender, ethnicity, blood type, drug type -->
+                            <!-- email, gender, ethnicity, blood type, drug type -->
                             <div class="form-row">
                                 <div class="form-group col-md-3">
-                                    <!-- TODO: email -->
+                                    <label for="patient_email">Email</label>
+                                    <input
+                                        type="email"
+                                        name="patient_email"
+                                        class="form-control"
+                                        ng-model="patient.email"
+                                        minlength="1"
+                                        maxlength="127"
+                                        placeholder="Email"
+                                    />
                                 </div>
                                 <div class="form-group col-md-3">
                                     <label for="patient_gender">Gender</label>
@@ -325,8 +356,7 @@
                             </div>
                             <!-- pharmacy -->
                             <div class="form-row">
-                                <div class="form-group col-md-2"></div>
-                                <div class="form-group col-md-3">
+                                <div class="form-group col-md-4">
                                     <label for="patient_drug_type"
                                         >Drug Type</label
                                     >
@@ -340,7 +370,7 @@
                                         <option ng-repeat="dt in drug_types">[[dt]]</option>
                                     </select>
                                 </div>
-                                <div class="form-group col-md-5">
+                                <div class="form-group col-md-8">
                                     <label for="patient_pharmacy"
                                         >Pharmacy</label
                                     >
@@ -353,7 +383,6 @@
                                         <option value="">Unspecified</option>
                                     </select>
                                 </div>
-                                <div class="form-group col-md-2"></div>
                             </div>
                             <!-- submit and delete button -->
                             <div class="form-row">
