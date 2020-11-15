@@ -114,11 +114,6 @@
 
                 // when submit button is pressed
                 $scope.submit_demographics = () => {
-                    // // {
-                    //     month: "2-digit",
-                    //     day: "2-digit",
-                    //     year: "numeric",
-                    // }
                     $scope.patient.dob = Intl.DateTimeFormat("en-US").format(
                         $scope.patient.dob
                     );
