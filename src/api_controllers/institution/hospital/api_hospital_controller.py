@@ -10,8 +10,8 @@ from http import HTTPStatus
 from marshmallow.exceptions import ValidationError
 from sqlalchemy.exc import IntegrityError
 
-from ....persistent.persistent import db
-from ....persistent.institution.hospital.hospital import Hospital, HospitalSchema
+from ....models.persistent.persistent import db
+from ....models.persistent.institution.hospital.hospital import Hospital, HospitalSchema
 from ....decorators import has_roles
 
 api_hospital_controller = Blueprint(

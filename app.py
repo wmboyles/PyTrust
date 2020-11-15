@@ -9,10 +9,10 @@ from flask import Flask
 from dotenv import load_dotenv
 import os
 
-import src.persistent.persistent as persistent
+import src.models.persistent.persistent as persistent
 import src.view_controllers.view_controller as view
 import src.api_controllers.api_controller as api
-import src.persistent.data_generator as data_generator
+import src.models.persistent.data_generator as data_generator
 
 
 def create_app(refresh_db=False):

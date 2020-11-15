@@ -7,7 +7,7 @@ This file contains API methods that relate to states.
 from flask import Blueprint, jsonify
 from http import HTTPStatus
 
-from ...persistent.state.state import State
+from ...models.persistent.state.state import State
 
 api_state_controller = Blueprint(
     "api_state_controller",

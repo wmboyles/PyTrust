@@ -11,9 +11,9 @@ from http import HTTPStatus
 from marshmallow.exceptions import ValidationError
 from sqlalchemy.exc import IntegrityError
 
-from ...persistent.persistent import db
-from ...persistent.drug.drug import Drug, DrugSchema
-from ...persistent.drug.drug_type import DrugType
+from ...models.persistent.persistent import db
+from ...models.persistent.drug.drug import Drug, DrugSchema
+from ...models.persistent.drug.drug_type import DrugType
 from ...decorators import has_roles
 
 # Controller blueprint that's exported to parent module to be registered
