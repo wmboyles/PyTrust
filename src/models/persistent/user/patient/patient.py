@@ -12,11 +12,11 @@ from sqlalchemy.orm import validates
 from ..user import User, UserRole
 from ...institution.pharmacy.pharmacy import Pharmacy
 from ...persistent import db, ma
-from ....persistent.state.state import State
-from ....persistent.drug.drug_type import DrugType
-from ....persistent.blood_type.blood_type import BloodType
-from ....persistent.ethnicity.ethnicity import Ethnicity
-from ....persistent.gender.gender import Gender
+from ....enums.state.state import State
+from ....enums.drug_type.drug_type import DrugType
+from ....enums.blood_type.blood_type import BloodType
+from ....enums.ethnicity.ethnicity import Ethnicity
+from ....enums.gender.gender import Gender
 
 
 class Patient(db.Model):

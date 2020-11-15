@@ -14,7 +14,7 @@ import re
 from sqlalchemy.sql.schema import UniqueConstraint
 
 from ..persistent import db, ma
-from .drug_type import DrugType
+from ...enums.drug_type.drug_type import DrugType
 
 
 class Drug(db.Model):

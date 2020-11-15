@@ -7,7 +7,7 @@ This file contains the abstract institution class, from which all instutions inh
 from sqlalchemy.orm import validates
 
 from ..persistent import db
-from ..state.state import State
+from ...enums.state.state import State
 
 
 class Institution(db.Model):

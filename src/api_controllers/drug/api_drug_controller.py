@@ -13,7 +13,7 @@ from sqlalchemy.exc import IntegrityError
 
 from ...models.persistent.persistent import db
 from ...models.persistent.drug.drug import Drug, DrugSchema
-from ...models.persistent.drug.drug_type import DrugType
+from ...models.enums.drug_type.drug_type import DrugType
 from ...decorators import has_roles
 
 # Controller blueprint that's exported to parent module to be registered
@@ -119,15 +119,3 @@ def delete_drug(id):
     db.session.commit()
 
     return "Successfully deleted drug", HTTPStatus.OK
-
-
-@api_drug_controller.route("/drug_types", methods=["GET"])
-@has_roles(roles=["admin", "patient", "hcp"])
-def get_all_drug_types():
-    """
-    Gets a list of all drugtypes defined by the DrugType enum.
-    """
-
-    drug_types = [dt.value for dt in DrugType]
-
-    return jsonify(drug_types), HTTPStatus.OK

@@ -9,7 +9,7 @@ from marshmallow_enum import EnumField
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from ..persistent import db, ma
-from .user_role import UserRole
+from ...enums.user_role.user_role import UserRole
 
 
 class User(db.Model):

@@ -1,8 +1,7 @@
 """
-This file essentially list all the api blueprints and saves them in a
-collection that can be imported by the main app. This is meant to cut down on
-the number of imports in the main app and make it easier to add and remove
-apis.
+This file imports and contains a collection of all api controllers.
+It specifies a url prefix for all api controllers so the routes don't conflict with view controllers.
+This file exists to cut down on the number of imports in the app.py file.
 
 :author William Boyles:
 """
@@ -13,24 +12,19 @@ from .user.patient import api_patient_controller as patient
 from .user.personnel import api_personnel_controller as personnel
 from .institution.pharmacy import api_pharmacy_controller as pharmacy
 from .institution.hospital import api_hospital_controller as hospital
-from .state import api_state_controller as state
-from .blood_type import api_blood_type_controller as blood_type
-from .ethnicity import api_ethnicity_controller as ethnicity
-from .gender import api_gender_controller as gender
+from .enums.api_enum_controllers import api_enum_controllers
+
 
 # All api prefixes begin with /api
 BASE_URL = "/api"
 
-# Collection of blueprints
-blueprints = {
+# Collection of api_controller blueprints
+api_controllers = {
     drug.api_drug_controller,
     user.api_user_controller,
     patient.api_patient_controller,
     personnel.api_personnel_controller,
     pharmacy.api_pharmacy_controller,
     hospital.api_hospital_controller,
-    state.api_state_controller,
-    blood_type.api_blood_type_controller,
-    ethnicity.api_ethnicity_controller,
-    gender.api_gender_controller,
+    *api_enum_controllers,
 }

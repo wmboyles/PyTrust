@@ -10,8 +10,8 @@ from dotenv import load_dotenv
 import os
 
 import src.models.persistent.persistent as persistent
-import src.view_controllers.view_controller as view
-import src.api_controllers.api_controller as api
+import src.view_controllers.view_controllers as view_controllers
+import src.api_controllers.api_controllers as api_controllers
 import src.models.persistent.data_generator as data_generator
 
 
@@ -38,11 +38,11 @@ def create_app(refresh_db=False):
     persistent.db.init_app(app)
     persistent.ma.init_app(app)
 
-    for view_blueprint in view.blueprints:
-        app.register_blueprint(view_blueprint, url_prefix=view.BASE_URL)
+    for view_blueprint in view_controllers.view_controllers:
+        app.register_blueprint(view_blueprint, url_prefix=view_controllers.BASE_URL)
 
-    for api_blueprint in api.blueprints:
-        app.register_blueprint(api_blueprint, url_prefix=api.BASE_URL)
+    for api_blueprint in api_controllers.api_controllers:
+        app.register_blueprint(api_blueprint, url_prefix=api_controllers.BASE_URL)
 
     app.app_context().push()
 

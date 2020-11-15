@@ -7,12 +7,12 @@ from datetime import datetime
 
 from .persistent import db
 
-from .user.user_role import UserRole
-from .state.state import State
-from .drug.drug_type import DrugType
-from .blood_type.blood_type import BloodType
-from .ethnicity.ethnicity import Ethnicity
-from .gender.gender import Gender
+from ..enums.user_role.user_role import UserRole
+from ..enums.state.state import State
+from ..enums.drug_type.drug_type import DrugType
+from ..enums.blood_type.blood_type import BloodType
+from ..enums.ethnicity.ethnicity import Ethnicity
+from ..enums.gender.gender import Gender
 
 from .user.user import User
 from .user.patient.patient import Patient

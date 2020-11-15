@@ -12,7 +12,7 @@ from marshmallow.exceptions import ValidationError
 
 from ...models.persistent.persistent import db
 from ...models.persistent.user.user import User, UserSchema
-from ...models.persistent.user.user_role import UserRole
+from ...models.enums.user_role.user_role import UserRole
 from ...decorators import has_roles
 
 api_user_controller = Blueprint(
@@ -115,15 +115,3 @@ def delete_user(id: int):
     db.session.commit()
 
     return "Successfully deleted user", HTTPStatus.OK
-
-
-@api_user_controller.route("/user_roles", methods=["GET"])
-@has_roles(roles=["admin"])
-def get_all_user_roles():
-    """
-    Gets a list of all user roles defined in the UserRole enum.
-    """
-
-    user_roles = [role.value for role in UserRole]
-
-    return jsonify(user_roles), HTTPStatus.OK

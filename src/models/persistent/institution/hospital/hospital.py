@@ -12,7 +12,7 @@ from sqlalchemy.sql.schema import UniqueConstraint
 
 from ...persistent import ma
 from ..instutitution import Institution
-from ...state.state import State
+from ....enums.state.state import State
 
 
 class Hospital(Institution):

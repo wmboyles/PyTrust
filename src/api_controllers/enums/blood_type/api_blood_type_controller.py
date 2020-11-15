@@ -7,7 +7,7 @@ This file contains API methods that relate to blood types.
 from flask import Blueprint, jsonify
 from http import HTTPStatus
 
-from ...models.persistent.blood_type.blood_type import BloodType
+from ....models.enums.blood_type.blood_type import BloodType
 
 api_blood_type_controller = Blueprint(
     "api_blood_type_controlller",

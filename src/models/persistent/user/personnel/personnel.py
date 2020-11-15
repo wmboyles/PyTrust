@@ -12,7 +12,7 @@ from ..user import User, UserRole
 from ...institution.hospital.hospital import Hospital
 from ...institution.pharmacy.pharmacy import Pharmacy
 from ...persistent import db, ma
-from ....persistent.state.state import State
+from ....enums.state.state import State
 
 
 class Personnel(db.Model):

@@ -1,8 +1,6 @@
 """
-This file essentially imports a list of all view blueprints and saves them in a
-collection that can be imported by the main app. This is meant to cut down on
-the number of imports in the main app and make it easier to add and remove
-views.
+This file imports and contains a collection of all api controllers.
+This file exists to cut down on the number of imports in the app.py file.
 
 :author William Boyles:
 """
@@ -24,8 +22,8 @@ from .personnel.pharmacist import pharmacist_view_controller as pharmacist
 # Base URL is defined by each blueprint, but keeps consistency with API
 BASE_URL = None
 
-# Collection of blueprints
-blueprints = {
+# Collection of view controller blueprints
+view_controllers = {
     login.login_view_controller,
     admin.admin_view_controller,
     patient.patient_view_controller,
