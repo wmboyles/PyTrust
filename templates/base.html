@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{{title}}</title>
+        <!-- Bootstrap import -->
+        <link
+            rel="stylesheet"
+            href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+        />
+        <!-- AngularJS import -->
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+        <!-- AngularJS code -->
+        <script src="{{'/static/js/' + angular_path}}"></script>
+    </head>
+    <body ng-app="{{angular_app}}" ng-controller="{{angular_controller}}">
+        <div class="container">
+            <div class="row">
+                {% block content %}{% endblock %}
+                <a href="/">Home</a>
+            </div>
+        </div>
+    </body>
+</html>
