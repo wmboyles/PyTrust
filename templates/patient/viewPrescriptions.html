@@ -1,76 +1,57 @@
-<html xmlns:th="http://www.thymeleaf.org">
+{% extends 'table_page.html' %}
 
-<head th:include="layout :: head(title=~{::title},links=~{})">
-<title>View Prescriptions</title>
-</head>
+<!-- set title -->
+{% set title = 'Patient | View Prescriptions' %}
 
-<body th:include="layout :: body" th:with="content=~{::content}">
-	<div th:fragment="content">
+<!-- set angular path -->
+{% set angular_path = 'patient/viewPrescriptions.js' %}
+<!-- set angular app -->
+{% set angular_app = 'viewPrescriptionsApp' %}
+<!-- set angular controller -->
+{% set angular_controller = 'viewPrescriptionsCtrl' %}
 
+<!-- set page heading -->
+{% set page_heading = 'Patient View Prescriptions' %}
 
-		<script th:inline="javascript">
-      /* Otherwise Thymeleaf tries to parse Javascript as XML and breaks itself sometimes.  Sigh */
-      /*<![CDATA[*/
-      var app = angular.module("prescriptionsApp", []);
+<!-- table template -->
+{% block table_template %}
+<table class="table table-bordered">
+    <caption>
+        Your Prescriptions
+    </caption>
+    <thead>
+        <tr scope="row">
+            <th scope="col">Drug (Type)</th>
+            <th scope="col">Dosage</th>
+            <th scope="col">Dates</th>
+            <th scope="col">Renewals</th>
+            <th scope="col">Prescriber</th>
+            <th scope="col">Pharmacy</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="p in prescriptions" ng-include="get_template(d)"></tr>
+    </tbody>
+</table>
+{% endblock %}
 
-      app.controller('prescriptionsCtrl', function ($scope, $http) {
-        $scope.prescriptions = [];
-        $scope.pattern = /^\d{4}-\d{4}-\d{2}$/;
-        $scope.loadTable = function () {
-          $http.get("/iTrust2/api/v1/prescriptions").then(
-            function (response) {
-              $scope.prescriptions = response.data;
-              $scope.message = "";
-            }, function (rejection) {
-              $scope.prescriptions = [];
-              $scope.message = "Could not display prescriptions";
-            });
-        }
-        $scope.loadTable();
-      });
-			/*]]>*/
-    </script>
+<!-- table view mode -->
+{% block table_view %}
+<script type="text/ng-template" id="view">
+    <td scope="col">[[p.drug.name + " (" + p.drug.type + ")"]]</td>
+    <td scope="col">[[p.dosage]]</td>
+    <td scope="col">[[p.start_date + " - " + p.end_date]]</td>
+    <td scope="col">[[p.renewals]]</td>
+    <td scope="col">[[p.prescriber.first_name + " " + p.prescriber.last_name]]</td>
+    <td scope="col">[[p.pharmacy.name + " " + p.pharmacy.address + " " + p.pharmacy.city + ", " + p.pharmacy.state + " " + p.pharmacy.zip]]</td>
+</script>
+{% endblock %}
 
-		<div ng-app="prescriptionsApp" ng-controller="prescriptionsCtrl">
-			<div class="container">
-				<div class="row">
-					<div class="col-md-12">
-						<div class="panel panel-primary">
-							<div class="panel-heading">
-								<h3>Patient View Prescriptions</h3>
-							</div>
-							<div class="panel-body">
-								<table class="table table-bordered">
-									<caption>My Prescriptions:</caption>
-									<thead>
-										<tr>
-											<th>Drug</th>
-											<th>Dosage (mg)</th>
-											<th>Start Date</th>
-											<th>End Date</th>
-											<th>Renewals</th>
-										</tr>
-									</thead>
-									<tbody>
-										<tr name="prescriptionTableRow"
-											ng-repeat="p in prescriptions | orderBy: 'drug'"
-											prescriptionId={{p.id}}>
-											<td name="drugCell">{{p.drug.name}}</td>
-											<td name="codeCell">{{p.dosage}}</td>
-											<td name="startCell">{{p.startDate | date :
-												'MM/dd/yyyy'}}</td>
-											<td name="endCell">{{p.endDate | date : 'MM/dd/yyyy'}}</td>
-											<td name="renewalsCell">{{p.renewals}}</td>
-										</tr>
-									</tbody>
-								</table>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-</body>
+<!-- table edit mode -->
+{% block table_edit %} {% endblock %}
 
-</html>
+<!-- create new heading -->
+{% set create_heading = '' %}
+
+<!-- create new form -->
+{% block create_form %} {% endblock %}
