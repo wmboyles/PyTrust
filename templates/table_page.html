@@ -8,10 +8,5 @@
 {% block table_view %}{% endblock %}
 <!-- table in edit mode -->
 {% block table_edit %}{% endblock %}
-
-<!-- area containing form to create whatever is in table-->
-<div class="panel panel-default">
-    <div class="panel-heading">{{create_heading}}</div>
-    <div class="panel-body">{% block create_form %}{% endblock %}</div>
-</div>
-{% endblock %}
+<!-- panel to create a new object -->
+{% block create_panel %} {% endblock %} {% endblock %}
