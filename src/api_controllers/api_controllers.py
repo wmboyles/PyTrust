@@ -12,6 +12,7 @@ from .user.patient import api_patient_controller as patient
 from .user.personnel import api_personnel_controller as personnel
 from .institution.pharmacy import api_pharmacy_controller as pharmacy
 from .institution.hospital import api_hospital_controller as hospital
+from .prescription import api_prescription_controller as prescription
 from .enums.api_enum_controllers import api_enum_controllers
 
 
@@ -26,5 +27,6 @@ api_controllers = {
     personnel.api_personnel_controller,
     pharmacy.api_pharmacy_controller,
     hospital.api_hospital_controller,
+    prescription.api_prescription_controller,
     *api_enum_controllers,
 }
