@@ -1,7 +1,6 @@
 """
 This file contains API methods related to drugs.
-This includes CRUD operations on Drug objects, as well as related items like
-drug types.
+This includes CRUD operations on Drug objects.
 
 :author William Boyles:
 """
@@ -13,7 +12,6 @@ from sqlalchemy.exc import IntegrityError
 
 from ...models.persistent.persistent import db
 from ...models.persistent.drug.drug import Drug, DrugSchema
-from ...models.enums.drug_type.drug_type import DrugType
 from ...decorators import has_roles
 
 # Controller blueprint that's exported to parent module to be registered
@@ -103,7 +101,7 @@ def edit_drug():
 
 @api_drug_controller.route("/drugs/<int:id>", methods=["DELETE"])
 @has_roles(roles=["admin"])
-def delete_drug(id):
+def delete_drug(id: int):
     """
     Deletes a drug with a given id
 
@@ -111,7 +109,6 @@ def delete_drug(id):
     """
 
     drug = Drug.query.get(id)
-
     if drug is None:
         return "No drug with that id", HTTPStatus.NOT_FOUND
 
