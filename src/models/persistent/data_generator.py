@@ -149,7 +149,7 @@ def _generate_hospital():
 
     h = Hospital()
     h.name = "hospital"
-    h.address = "123 Hospitla St"
+    h.address = "123 Hospital St"
     h.city = "Everytown"
     h.state = State.NORTH_CAROLINA
     h.zip = 12345
@@ -196,7 +196,7 @@ def _generate_prescription():
         prescription.pharmacy = pharmacy
         prescription.dosage = 100
         prescription.prescriber = hcp
-        prescription.drug_code = drug.code
+        prescription.drug = drug
         prescription.start_date = datetime.today()
         prescription.end_date = prescription.start_date + timedelta(weeks=3)
         prescription.renewals = 1

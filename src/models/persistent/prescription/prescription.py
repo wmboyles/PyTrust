@@ -34,9 +34,9 @@ class Prescription(db.Model):
     :param prescriber_id: user id of hcp who assigned the prescription
     :param prescriber: prescriber personnel object. This field is generally how
         the prescriber will be set, and the id will be updated automatically.
-    :param drug_code: NDC code of prescribed drug. We don't store the actual
-        drug object so that the pharmacist can take into account patient drug
-        type preferences.
+    :param drug_id: id of prescribed drug.
+    :param drug: prescribed drug object. This field is generally how the drug
+        will be set, and the id will be updated automatically.
     :param dosage: amount of drug that patient should take
     :param renewals: number of times that prescription can be re-filled between
         the start and end dates. The inital filling of the prescription does
@@ -65,7 +65,9 @@ class Prescription(db.Model):
         Personnel, backref=db.backref("prescriptions", cascade="all, delete-orphan")
     )
 
-    drug_code = db.Column(db.String(127), db.ForeignKey("drug.code"), nullable=False)
+    drug_id = db.Column(db.Integer, db.ForeignKey("drug.id"), nullable=False)
+    drug = db.relationship(Drug, backref="prescriptions")
+
     dosage = db.Column(db.Integer, nullable=False)
     renewals = db.Column(db.Integer, nullable=False)
 
@@ -120,18 +122,6 @@ class Prescription(db.Model):
 
         return renewals
 
-    @validates("drug_code")
-    def validate_code(self, key, code: str) -> str:
-        """
-        Validates that code field matches the required pattern.
-
-        :param code: string NDC code to validate
-        :return: validated NDC code
-        :raises AssertionError: if code does not match pattern
-        """
-
-        return Drug.validate_code(None, None, code=code)
-
     @validates("start_date", "end_date")
     def validate_end_date(self, key, date: datetime) -> datetime:
         """
@@ -166,6 +156,7 @@ class PrescriptionSchema(ma.SQLAlchemyAutoSchema):
     patient = ma.Nested("PatientSchema")
     prescriber = ma.Nested("PersonnelSchema")
     pharmacy = ma.Nested("PharmacySchema", allow_none=True)
+    drug = ma.Nested("DrugSchema")
 
     start_date = fields.Date(format="%m/%d/%Y")
     end_date = fields.Date(format="%m/%d/%Y")
