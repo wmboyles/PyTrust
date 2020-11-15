@@ -1,385 +1,191 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Admin | Manage Pharmacies</title>
-        <!-- Bootstrap import -->
-        <link
-            rel="stylesheet"
-            href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-        />
-        <!-- AngularJS import -->
-        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
-        <!-- AngularJS code -->
-        <script>
-            var app = angular.module(
-                "managePharmaciesApp",
-                [],
-                // Change the delimiter symbols to [[ and ]]
-                ($interpolateProvider) => {
-                    $interpolateProvider.startSymbol("[[");
-                    $interpolateProvider.endSymbol("]]");
-                }
-            );
-            app.controller("mangePharmaciesCtrl", ($scope, $http) => {
-                // Is the pharmacy being edited or viewed?
-                $scope.get_template = (pharmacy) => {
-                    if (pharmacy.id === $scope.selected_pharmacy.id) {
-                        return "edit";
-                    } else {
-                        return "view";
-                    }
-                };
+{% extends 'table_page.html' %}
 
-                // check that the pharmacy fields are valid
-                var check_pharmacy = (pharmacy) => {
-                    var err = [];
-                    if (!pharmacy.name) {
-                        err.push("Pharmacy must have a name");
-                    }
-                    if (!pharmacy.address) {
-                        err.push("Pharmacy must have an address");
-                    }
-                    if (!pharmacy.city) {
-                        err.push("Pharmacy must have a city");
-                    }
-                    if (!pharmacy.state) {
-                        err.push("Pharmacy must have a state");
-                    }
-                    if (!pharmacy.zip) {
-                        err.push("Pharmacy must have a zip code");
-                    }
+<!-- set title -->
+{% set title = 'Admin | Manage Pharmacies' %}
 
-                    return err.join(". ");
-                };
+<!-- set angular path -->
+{% set angular_path = 'admin/pharmacies.js' %}
+<!-- set angular app -->
+{% set angular_app = 'managePharmaciesApp' %}
+<!-- set angular controller -->
+{% set angular_controller = 'mangePharmaciesCtrl' %}
 
-                // load all pharmacies from the DB
-                $scope.load_pharmacies = () => {
-                    $http.get("/api/pharmacies").then(
-                        (res) => {
-                            $scope.pharmacies = res.data;
-                        },
-                        (err) => {
-                            $scope.pharmacies = [];
-                        }
-                    );
-                };
+<!-- set page heading -->
+{% set page_heading = 'Admin Manage Pharmacies' %}
 
-                // get list of states, territories
-                $scope.load_states = () => {
-                    $http.get("/api/states").then(
-                        (res) => {
-                            $scope.states = res.data;
-                        },
-                        (err) => {
-                            $scope.states = [];
-                        }
-                    );
-                };
+<!-- table template  -->
+{% block table_template %}
+<table class="table table-bordered">
+    <caption>
+        Existing Pharmacies
+    </caption>
+    <thead>
+        <tr scope="row">
+            <th scope="col">Name</th>
+            <th scope="col">Location</th>
+            <th scope="col">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="p in pharmacies" ng-include="get_template(p)"></tr>
+    </tbody>
+</table>
+{% endblock %}
 
-                // pharmacy edit operation is cancelled
-                $scope.reset_edit = () => {
-                    $scope.selected_pharmacy = {};
-                };
+<!-- table view mode -->
+{% block table_view %}
+<script type="text/ng-template" id="view">
+    <td scope="col">[[p.name]]</td>
+    <td scope="col">[[p.address + " " + p.city + ", " + p.state + " " + p.zip]]</td>
+    <td scope="col">
+        <button class="col-md-6 btn btn-success" ng-click="edit_pharmacy(p)">Edit</button>
+        <button class="col-md-6 btn btn-danger" ng-click="delete_pharmacy(p)">Delete</button>
+    </td>
+</script>
+{% endblock %}
 
-                // pharmacy has been submitted
-                $scope.reset_create = () => {
-                    $scope.pharmacy = {};
-                };
-
-                // reset success and error messages
-                $scope.reset_messages = () => {
-                    $scope.error_message = "";
-                    $scope.success_message = "";
-                };
-
-                // when pharmacy is selected for editing
-                $scope.edit_pharmacy = (pharmacy) => {
-                    $scope.selected_pharmacy = angular.copy(pharmacy);
-                };
-
-                // pharmacy has been editing and should not be saved
-                $scope.save_pharmacy = () => {
-                    var err = check_pharmacy($scope.selected_pharmacy);
-                    if (err) {
-                        $scope.error_message = err;
-                        return;
-                    }
-
-                    $http.put("/api/pharmacies", $scope.selected_pharmacy).then(
-                        (res) => {
-                            $scope.reset_edit();
-                            $scope.load_pharmacies();
-                            $scope.error_message = "";
-                            $scope.success_message =
-                                "Successfully edited pharmacy";
-                        },
-                        (err) => {
-                            $scope.error_message = "" + err.data;
-                            $scope.success_message = "";
-                        }
-                    );
-                };
-
-                // pharmacy is being deleted
-                $scope.delete_pharmacy = (pharmacy) => {
-                    if (
-                        confirm(
-                            "Are you sure you want to delete this pharmacy?"
-                        )
-                    ) {
-                        $http.delete("/api/pharmacies/" + pharmacy.id).then(
-                            (res) => {
-                                $scope.load_pharmacies();
-                                $scope.error_message = "";
-                                $scope.success_message =
-                                    "Successfully deleted pharmacy";
-                            },
-                            (err) => {
-                                $scope.error_message = err.data;
-                                $scope.success_message = "";
-                            }
-                        );
-                    }
-                };
-
-                // a new pharmacy has been submitted for creation
-                $scope.add_pharmacy = () => {
-                    $http.post("/api/pharmacies", $scope.pharmacy).then(
-                        (res) => {
-                            $scope.reset_create();
-                            $scope.load_pharmacies();
-                            $scope.error_message = "";
-                            $scope.success_message =
-                                "Successfully created pharmacy";
-                        },
-                        (err) => {
-                            $scope.error_message = err.data;
-                            $scope.success_message = "";
-                        }
-                    );
-                };
-
-                // Runs on page load
-                $scope.reset_edit();
-                $scope.reset_create();
-                $scope.reset_messages();
-
-                $scope.load_pharmacies();
-                $scope.load_states();
-            });
-        </script>
-    </head>
-    <body ng-app="managePharmaciesApp" ng-controller="mangePharmaciesCtrl">
-        <div class="container">
-            <div class="row">
-                <div class="panel panel-primary">
-                    <div class="panel-heading">
-                        <h1>Admin Manage Pharmacies</h1>
-                    </div>
-                    <div class="panel-body">
-                        <table class="table table-bordered">
-                            <caption>
-                                Existing Pharmacies
-                            </caption>
-                            <thead>
-                                <tr scope="row">
-                                    <th scope="col">Name</th>
-                                    <th scope="col">Location</th>
-                                    <th scope="col">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr
-                                    ng-repeat="p in pharmacies"
-                                    ng-include="get_template(p)"
-                                ></tr>
-                            </tbody>
-                        </table>
-
-                        <!-- table in view mode -->
-                        <script type="text/ng-template" id="view">
-                            <td scope="col">[[p.name]]</td>
-                            <td scope="col">[[p.address + " " + p.city + ", " + p.state + " " + p.zip]]</td>
-                            <td scope="col">
-                                <button class="col-md-6 btn btn-success" ng-click="edit_pharmacy(p)">Edit</button>
-                            	<button class="col-md-6 btn btn-danger" ng-click="delete_pharmacy(p)">Delete</button>
-                            </td>
-                        </script>
-
-                        <!-- table in edit mode -->
-                        <script type="text/ng-template" id="edit">
-                            <td scope="col">
-                                <input
-                                    type="text"
-                                    class="form-control"
-                                    ng-model="selected_pharmacy.name"
-                                    minlength="1"
-                                    maxlength="127">
-                            </td>
-                            <td scope="col">
-                                <div class="form-row">
-                                    <div class="form-group col-md-8">
-                                        <input
-                                            type="text"
-                                            class="form-control"
-                                            ng-model="selected_pharmacy.address"
-                                            minlength="1"
-                                            maxlength="127">
-                                    </div>
-                                    <div class="form-group col-md-4">
-                                        <input
-                                            type="text"
-                                            class="form-control"
-                                            ng-model="selected_pharmacy.city"
-                                            minlength="1"
-                                            maxlength="127">
-                                    </div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group col-md-8">
-                                        <select
-                                            class="form-control"
-                                            ng-model="selected_pharmacy.state">
-                                            <option
-                                                ng-repeat="st in states"
-                                                ng-value="st[0]">[[ st[0] + " - " + st[1] ]]
-                                            </option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group col-md-4">
-                                        <input
-                                            type="text"
-                                            class="form-control"
-                                            ng-model="selected_pharmacy.zip"
-                                            minlength="1"
-                                            maxlength="5">
-                                    </div>
-                                </div>
-                            </td>
-                            <td scope="col">
-                                <button class="col-md-6 btn btn-success" ng-click="save_pharmacy()">Save</button>
-                            	<button class="col-md-6 btn btn-danger" ng-click="reset_edit()">Cancel</button>
-                            </td>
-                        </script>
-
-                        <!-- create a new pharmacy, success and error messages -->
-                        <div class="panel panel-default">
-                            <div class="panel-heading">Add a Pharmacy</div>
-                            <div class="panel-body">
-                                <!--- Create a new pharmacy form -->
-                                <form
-                                    role="form"
-                                    name="add_pharmacy_form"
-                                    ng-submit="add_pharmacy(add_pharmacy_form.$valid)"
-                                >
-                                    <!-- name and street address  -->
-                                    <div class="form-row">
-                                        <div class="form-group col-md-6">
-                                            <label for="pharmacy_name"
-                                                >Name</label
-                                            >
-                                            <input
-                                                type="text"
-                                                class="form-control"
-                                                name="pharmacy_name"
-                                                ng-model="pharmacy.name"
-                                                minlength="1"
-                                                maxlength="127"
-                                                required
-                                            />
-                                        </div>
-                                        <div class="form-group col-md-6">
-                                            <label for="pharmacy_address"
-                                                >Address</label
-                                            >
-                                            <input
-                                                type="text"
-                                                class="form-control"
-                                                name="pharmacy_address"
-                                                ng-model="pharmacy.address"
-                                                minlength="1"
-                                                maxlength="127"
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-                                    <!-- city, state, zip -->
-                                    <div class="form-row">
-                                        <div class="form-group col-md-6">
-                                            <label for="pharmacy_city"
-                                                >City</label
-                                            >
-                                            <input
-                                                type="text"
-                                                class="form-control"
-                                                name="pharmacy_city"
-                                                ng-model="pharmacy.city"
-                                                minlength="1"
-                                                maxlength="127"
-                                                required
-                                            />
-                                        </div>
-                                        <div class="form-group col-md-4">
-                                            <label for="pharmacy_state"
-                                                >State</label
-                                            >
-                                            <select
-                                                name="pharmacy_state"
-                                                class="form-control"
-                                                ng-model="pharmacy.state"
-                                                required
-                                            >
-                                                <option value="">
-                                                    Select One
-                                                </option>
-                                                <!-- prettier-ignore -->
-                                                <option ng-repeat="st in states" ng-value="st[0]">[[ st[0] + " - " + st[1] ]]</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group col-md-2">
-                                            <label for="pharmacy_zip"
-                                                >Zip</label
-                                            >
-                                            <input
-                                                type="text"
-                                                class="form-control"
-                                                name="pharmacy_zip"
-                                                ng-model="pharmacy.zip"
-                                                minlength="1"
-                                                maxlength="5"
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-                                    <!-- submit button -->
-                                    <div class="form-row">
-                                        <div
-                                            class="form-group col-md-12 text-right"
-                                        >
-                                            <button
-                                                type="submit"
-                                                class="btn btn-success"
-                                                name="submit"
-                                            >
-                                                Submit
-                                            </button>
-                                        </div>
-                                    </div>
-                                </form>
-                                <!-- success and error messages -->
-                                <div>
-                                    <!-- prettier-ignore -->
-                                    <p class="text-danger" ng-model="error_message">[[error_message]]</p>
-                                    <!-- prettier-ignore -->
-                                    <p class="text-success" ng-model="success_message">[[success_message]]</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+<!-- table in edit mode -->
+{% block table_edit %}
+<script type="text/ng-template" id="edit">
+    <td scope="col">
+        <input
+            type="text"
+            class="form-control"
+            ng-model="selected_pharmacy.name"
+            minlength="1"
+            maxlength="127">
+    </td>
+    <td scope="col">
+        <div class="form-row">
+            <div class="form-group col-md-8">
+                <input
+                    type="text"
+                    class="form-control"
+                    ng-model="selected_pharmacy.address"
+                    minlength="1"
+                    maxlength="127">
             </div>
-
-            <a href="/admin">Home</a>
+            <div class="form-group col-md-4">
+                <input
+                    type="text"
+                    class="form-control"
+                    ng-model="selected_pharmacy.city"
+                    minlength="1"
+                    maxlength="127">
+            </div>
         </div>
-    </body>
-</html>
+        <div class="form-row">
+            <div class="form-group col-md-8">
+                <select
+                    class="form-control"
+                    ng-model="selected_pharmacy.state">
+                    <option
+                        ng-repeat="st in states"
+                        ng-value="st[0]">[[ st[0] + " - " + st[1] ]]
+                    </option>
+                </select>
+            </div>
+            <div class="form-group col-md-4">
+                <input
+                    type="text"
+                    class="form-control"
+                    ng-model="selected_pharmacy.zip"
+                    minlength="1"
+                    maxlength="5">
+            </div>
+        </div>
+    </td>
+    <td scope="col">
+        <button class="col-md-6 btn btn-success" ng-click="save_pharmacy()">Save</button>
+        <button class="col-md-6 btn btn-danger" ng-click="reset_edit()">Cancel</button>
+    </td>
+</script>
+{% endblock %}
+
+<!-- create new hospital heading -->
+{% set create_heading = 'Add a Hospital' %}
+
+<!-- create new hospital form -->
+{% block create_form %}
+<form
+    role="form"
+    name="add_pharmacy_form"
+    ng-submit="add_pharmacy(add_pharmacy_form.$valid)"
+>
+    <!-- name and street address  -->
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label for="pharmacy_name">Name</label>
+            <input
+                type="text"
+                class="form-control"
+                name="pharmacy_name"
+                ng-model="pharmacy.name"
+                minlength="1"
+                maxlength="127"
+                required
+            />
+        </div>
+        <div class="form-group col-md-6">
+            <label for="pharmacy_address">Address</label>
+            <input
+                type="text"
+                class="form-control"
+                name="pharmacy_address"
+                ng-model="pharmacy.address"
+                minlength="1"
+                maxlength="127"
+                required
+            />
+        </div>
+    </div>
+    <!-- city, state, zip -->
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label for="pharmacy_city">City</label>
+            <input
+                type="text"
+                class="form-control"
+                name="pharmacy_city"
+                ng-model="pharmacy.city"
+                minlength="1"
+                maxlength="127"
+                required
+            />
+        </div>
+        <div class="form-group col-md-4">
+            <label for="pharmacy_state">State</label>
+            <select
+                name="pharmacy_state"
+                class="form-control"
+                ng-model="pharmacy.state"
+                required
+            >
+                <option value="">Select One</option>
+                <!-- prettier-ignore -->
+                <option ng-repeat="st in states" ng-value="st[0]">[[ st[0] + " - " + st[1] ]]</option>
+            </select>
+        </div>
+        <div class="form-group col-md-2">
+            <label for="pharmacy_zip">Zip</label>
+            <input
+                type="text"
+                class="form-control"
+                name="pharmacy_zip"
+                ng-model="pharmacy.zip"
+                minlength="1"
+                maxlength="5"
+                required
+            />
+        </div>
+    </div>
+    <!-- submit button -->
+    <div class="form-row">
+        <div class="form-group col-md-12 text-right">
+            <button type="submit" class="btn btn-success" name="submit">
+                Submit
+            </button>
+        </div>
+    </div>
+</form>
+{% endblock %}
