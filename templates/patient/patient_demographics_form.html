@@ -1,0 +1,198 @@
+{% macro patient_demographics_form() %}
+<form
+    role="form"
+    name="patient_demographics_form"
+    ng-submit="submit_demographics(patient_demographics_form.$valid)"
+>
+    <!-- first last name, dob -->
+    <div class="form-row">
+        <div class="form-group col-md-4">
+            <label for="patient_first_name">First Name</label>
+            <input
+                type="text"
+                class="form-control"
+                name="patient_first_name"
+                ng-model="patient.first_name"
+                minlength="1"
+                maxlength="127"
+                placeholder="First Name"
+                required
+            />
+        </div>
+        <div class="form-group col-md-4">
+            <label for="patient_last_name">Last Name</label>
+            <input
+                type="text"
+                class="form-control"
+                name="patient_last_name"
+                ng-model="patient.last_name"
+                minlength="1"
+                maxlength="127"
+                placeholder="Last Name"
+                required
+            />
+        </div>
+        <div class="form-group col-md-4">
+            <label for="patient_dob">Date of Birth</label>
+            <input
+                type="date"
+                class="form-control"
+                name="patient_dob"
+                ng-model="patient.dob"
+                required
+            />
+        </div>
+    </div>
+    <!-- location fields -->
+    <div class="form-row">
+        <div class="form-group col-md-4">
+            <label for="patient_address">Address</label>
+            <input
+                type="text"
+                class="form-control"
+                name="patient_address"
+                ng-model="patient.address"
+                minlength="1"
+                maxlength="127"
+                placeholder="Street Address"
+                required
+            />
+        </div>
+        <div class="form-group col-md-3">
+            <label for="patient_city">City</label>
+            <input
+                type="text"
+                class="form-control"
+                name="patient_city"
+                ng-model="patient.city"
+                minlength="1"
+                maxlength="127"
+                placeholder="City"
+                required
+            />
+        </div>
+        <div class="form-group col-md-3">
+            <label for="patient_state">State</label>
+            <select
+                class="form-control"
+                name="patient_state"
+                ng-model="patient.state"
+                required
+            >
+                <option value="">Select One</option>
+                <!-- prettier-ignore -->
+                <option ng-repeat="st in states" ng-value="st[0]">[[ st[0] + " - " + st[1] ]]</option>
+            </select>
+        </div>
+        <div class="form-group col-md-2">
+            <label for="patient_zip">Zip</label>
+            <input
+                type="text"
+                class="form-control"
+                name="patient_zip"
+                ng-model="patient.zip"
+                minlength="1"
+                maxlength="5"
+                placeholder="#####"
+                pattern="[1-9][0-9]{4}"
+                required
+            />
+        </div>
+    </div>
+    <!-- email, gender, ethnicity, blood type, drug type -->
+    <div class="form-row">
+        <div class="form-group col-md-3">
+            <label for="patient_email">Email</label>
+            <input
+                type="email"
+                name="patient_email"
+                class="form-control"
+                ng-model="patient.email"
+                minlength="1"
+                maxlength="127"
+                placeholder="Email"
+            />
+        </div>
+        <div class="form-group col-md-3">
+            <label for="patient_gender">Gender</label>
+            <select
+                class="form-control"
+                name="patient_gender"
+                ng-model="patient.gender"
+            >
+                <option value="">Unspecified</option>
+                <!-- prettier-ignore -->
+                <option ng-repeat="gen in genders">[[gen]]</option>
+            </select>
+        </div>
+        <div class="form-group col-md-3">
+            <label for="patient_ethnicity">Ethnicity</label>
+            <select
+                class="form-control"
+                name="patient_ethnicity"
+                ng-model="patient.ethnicity"
+            >
+                <option value="">Unspecified</option>
+                <!-- prettier-ignore -->
+                <option ng-repeat="eth in ethnicities">[[eth]]</option>
+            </select>
+        </div>
+        <div class="form-group col-md-3">
+            <label for="patient_blood_type">Blood Type</label>
+            <select
+                class="form-control"
+                name="patient_blood_type"
+                ng-model="patient.blood_type"
+            >
+                <option value="">Unspecified</option>
+                <!-- prettier-ignore -->
+                <option ng-repeat="bt in blood_types">[[bt]]</option>
+            </select>
+        </div>
+    </div>
+    <!-- pharmacy -->
+    <div class="form-row">
+        <div class="form-group col-md-4">
+            <label for="patient_drug_type">Drug Type</label>
+            <select
+                class="form-control"
+                name="patient_drug_type"
+                ng-model="patient.drug_type"
+            >
+                <option value="">Select One</option>
+                <!-- prettier-ignore -->
+                <option ng-repeat="dt in drug_types">[[dt]]</option>
+            </select>
+        </div>
+        <div class="form-group col-md-8">
+            <label for="patient_pharmacy">Pharmacy</label>
+            <select
+                class="form-control"
+                name="patient_pharmacy"
+                ng-model="patient.pharmacy"
+                ng-options="ph as (ph.name + ' - ' + ph.address + ' ' + ph.city + ', ' + ph.state + ' ' + ph.zip) for ph in pharmacies track by ph.id"
+            >
+                <option value="">Unspecified</option>
+            </select>
+        </div>
+    </div>
+    <!-- submit and delete button -->
+    <div class="form-row">
+        <div class="col-md-6 text-left">
+            <button
+                type="button"
+                class="btn btn-danger"
+                name="delete"
+                ng-click="delete_self()"
+            >
+                Delete
+            </button>
+        </div>
+        <div class="col-md-6 text-right">
+            <button type="submit" class="btn btn-success" name="submit">
+                Submit
+            </button>
+        </div>
+    </div>
+</form>
+{% endmacro %}
