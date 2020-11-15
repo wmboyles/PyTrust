@@ -87,13 +87,10 @@ class DrugSchema(ma.SQLAlchemyAutoSchema):
         This method is called when calling a load. It transforms a dictionary
         representing the object into the object itself.
 
-        :param data: Dict data representing drug object
+        :param data: dict data representing drug object
         """
 
         return Drug(**data)
 
     # Enums have to be done a bit more explicitly to serialize correctly
     type = EnumField(DrugType, by_value=True)
-
-    # include list of fields where you want to object rather than the key
-    # things = ma.Nested("ThingSchema")
