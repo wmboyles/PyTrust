@@ -85,6 +85,7 @@
                     );
                 };
 
+                // load all the ethnicities from the db
                 $scope.load_ethnicities = () => {
                     $http.get("/api/ethnicities").then(
                         (res) => {
@@ -92,6 +93,18 @@
                         },
                         (err) => {
                             $scope.ethnicities = [];
+                        }
+                    );
+                };
+
+                // load all the genders from the db
+                $scope.load_genders = () => {
+                    $http.get("/api/genders").then(
+                        (res) => {
+                            $scope.genders = res.data;
+                        },
+                        (err) => {
+                            $scope.genders = [];
                         }
                     );
                 };
@@ -155,6 +168,7 @@
                 $scope.load_blood_types();
                 $scope.load_pharmacies();
                 $scope.load_ethnicities();
+                $scope.load_genders();
 
                 $scope.load_self();
             });
@@ -263,9 +277,24 @@
                                     />
                                 </div>
                             </div>
-                            <!-- blood type, drug type, pharmacy -->
+                            <!-- gender, ethnicity, blood type, drug type -->
                             <div class="form-row">
-                                <div class="form-group col-md-2">
+                                <div class="form-group col-md-3">
+                                    <!-- TODO: email -->
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="patient_gender">Gender</label>
+                                    <select
+                                        class="form-control"
+                                        name="patient_gender"
+                                        ng-model="patient.gender"
+                                    >
+                                        <option value="">Unspecified</option>
+                                        <!-- prettier-ignore -->
+                                        <option ng-repeat="gen in genders">[[gen]]</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-md-3">
                                     <label for="patient_ethnicity"
                                         >Ethnicity</label
                                     >
@@ -279,7 +308,7 @@
                                         <option ng-repeat="eth in ethnicities">[[eth]]</option>
                                     </select>
                                 </div>
-                                <div class="form-group col-md-2">
+                                <div class="form-group col-md-3">
                                     <label for="patient_blood_type"
                                         >Blood Type</label
                                     >
@@ -293,7 +322,11 @@
                                         <option ng-repeat="bt in blood_types">[[bt]]</option>
                                     </select>
                                 </div>
-                                <div class="form-group col-md-2">
+                            </div>
+                            <!-- pharmacy -->
+                            <div class="form-row">
+                                <div class="form-group col-md-2"></div>
+                                <div class="form-group col-md-3">
                                     <label for="patient_drug_type"
                                         >Drug Type</label
                                     >
@@ -307,7 +340,7 @@
                                         <option ng-repeat="dt in drug_types">[[dt]]</option>
                                     </select>
                                 </div>
-                                <div class="form-group col-md-6">
+                                <div class="form-group col-md-5">
                                     <label for="patient_pharmacy"
                                         >Pharmacy</label
                                     >
@@ -320,6 +353,7 @@
                                         <option value="">Unspecified</option>
                                     </select>
                                 </div>
+                                <div class="form-group col-md-2"></div>
                             </div>
                             <!-- submit and delete button -->
                             <div class="form-row">

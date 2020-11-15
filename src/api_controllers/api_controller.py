@@ -16,6 +16,7 @@ from .institution.hospital import api_hospital_controller as hospital
 from .state import api_state_controller as state
 from .blood_type import api_blood_type_controller as blood_type
 from .ethnicity import api_ethnicity_controller as ethnicity
+from .gender import api_gender_controller as gender
 
 # All api prefixes begin with /api
 BASE_URL = "/api"
@@ -31,4 +32,5 @@ blueprints = {
     state.api_state_controller,
     blood_type.api_blood_type_controller,
     ethnicity.api_ethnicity_controller,
+    gender.api_gender_controller,
 }
