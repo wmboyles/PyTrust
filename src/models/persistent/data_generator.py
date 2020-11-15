@@ -3,7 +3,7 @@ This file generates sample data in the database
 
 :author William Boyles:
 """
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from .persistent import db
 
@@ -197,6 +197,9 @@ def _generate_prescription():
         prescription.dosage = 100
         prescription.prescriber = hcp
         prescription.drug_code = drug.code
+        prescription.start_date = datetime.today()
+        prescription.end_date = prescription.start_date + timedelta(weeks=3)
+        prescription.renewals = 1
 
     db.session.add(prescription)
     db.session.commit()
