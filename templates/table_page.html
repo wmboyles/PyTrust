@@ -1,3 +1,13 @@
+<!--
+    This is the table flask template.
+    It is a more specific version of the simple messages template indended for
+    when there is a table of objects to view.
+    Pages that extend this template will have to define the contents of the
+    table and, if applicable, the behavior of the table in view and edit modes.
+    There is also the optional addition of an area below the table, usually
+    intended for creating objects and adding them to the table.
+-->
+
 {% extends 'simple_messages.html' %}
 
 <!-- page content -->
@@ -8,5 +18,5 @@
 {% block table_view %}{% endblock %}
 <!-- table in edit mode -->
 {% block table_edit %}{% endblock %}
-<!-- panel to create a new object -->
+<!-- optional panel to create a new object -->
 {% block create_panel %} {% endblock %} {% endblock %}

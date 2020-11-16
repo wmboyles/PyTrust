@@ -1,3 +1,10 @@
+<!--
+    This is the simple messages flask template.
+    It is a more specific version of the base template (that's why it extends it)
+    that contains a large panel with a heading and a section for green success messages and red error messages.
+    The hope is that all pages that use these sorts of messages can extend this template.
+-->
+
 {% extends 'base.html' %}
 
 <!-- page content -->
@@ -7,6 +14,7 @@
         <h1>{{page_heading}}</h1>
     </div>
     <div class="panel-body">
+        <!-- content unique from simple messages page -->
         {% block panel_content %}{% endblock %}
         <!-- success and error messages -->
         <div>

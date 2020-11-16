@@ -1,3 +1,9 @@
+<!--
+    This is the base flask template.
+    It contains things that nearly every page in the application should have, like importing Boostrap and AngularJS.
+    The hope is that almost all pages in the application can follow this structure.
+-->
+
 <!DOCTYPE html>
 <html>
     <head>
@@ -15,6 +21,7 @@
     <body ng-app="{{angular_app}}" ng-controller="{{angular_controller}}">
         <div class="container">
             <div class="row">
+                <!-- content unique from base page -->
                 {% block content %}{% endblock %}
                 <a href="/">Home</a>
             </div>
