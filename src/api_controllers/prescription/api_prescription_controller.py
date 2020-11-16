@@ -68,7 +68,11 @@ def make_prescription():
     except (AssertionError, ValidationError) as e:
         return str(e), HTTPStatus.BAD_REQUEST
 
-    db.session.add(prescription)
+    # we have to do a tiny bit of merging manually
+    prescription.prescriber.user_id = prescription.prescriber.user.id
+    prescription.patient.user_id = prescription.patient.user.id
+
+    db.session.merge(prescription)
     db.session.commit()
 
     out_prescription = prescription_schema.dump(prescription)
@@ -94,6 +98,10 @@ def edit_prescription():
     if old_prescription is None:
         return "No prescription with that id", HTTPStatus.NOT_FOUND
 
+    # we have to do a tiny bit of merging manually
+    new_prescription.prescriber.user_id = new_prescription.prescriber.user.id
+    new_prescription.patient.user_id = new_prescription.patient.user.id
+
     db.session.merge(new_prescription)
     db.session.commit()
 
@@ -116,3 +124,5 @@ def delete_prescription(id: int):
 
     db.session.delete(prescription)
     db.session.commit()
+
+    return "Successfully deleted prescription", HTTPStatus.OK
