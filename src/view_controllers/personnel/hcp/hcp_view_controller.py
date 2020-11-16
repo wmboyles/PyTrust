@@ -30,3 +30,9 @@ def home():
 @has_roles(roles=["hcp"], return_if_fail=RETURN_IF_FAIL)
 def edit_patient_demographics():
     return render_template(BASE_FILE_URL + "editPatientDemographics.html")
+
+
+@hcp_view_controller.route("/prescriptions")
+@has_roles(roles=["hcp"], return_if_fail=RETURN_IF_FAIL)
+def manage_prescriptions():
+    return render_template(BASE_FILE_URL + "prescriptions.html")

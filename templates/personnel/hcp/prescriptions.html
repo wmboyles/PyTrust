@@ -1,0 +1,189 @@
+{% extends 'table_create_page.html' %}
+
+<!-- set angular path -->
+{% set angular_path = 'hcp/prescriptions.js' %}
+<!-- set angular app -->
+{% set angular_app = 'managePrescriptionsApp' %}
+<!-- set angular controller -->
+{% set angular_controller = 'managePrescriptionsCtrl' %}
+
+<!-- set page heading -->
+{% set page_heading = 'HCP Manage Prescriptions' %}
+
+<!-- table template  -->
+{% block table_template %}
+<table class="table table-bordered">
+    <caption>
+        My Prescriptions
+    </caption>
+    <thead>
+        <tr scope="row">
+            <th scope="col">Drug (Type)</th>
+            <th scope="col">Dosage</th>
+            <th scope="col">Dates</th>
+            <th scope="col">Renewals</th>
+            <th scope="col">Patient (username)</th>
+            <th scope="col">Pharmacy</th>
+            <th scope="col">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="p in prescriptions" ng-include="get_template(p)"></tr>
+    </tbody>
+</table>
+{% endblock %}
+
+<!-- table in view mode -->
+{% block table_view %}
+<script type="text/ng-template" id="view">
+    <td scope="col">[[p.drug.name + " (" + p.drug.type + ")"]]</td>
+    <td scope="col">[[p.dosage]]</td>
+    <td scope="col">[[p.start_date.toLocaleDateString() + " - " + p.end_date.toLocaleDateString()]]</td>
+    <td scope="col">[[p.renewals]]</td>
+    <td scope="col">[[p.patient.first_name + " " + p.patient.last_name + " (" + p.patient.user.username + ")"]]</td>
+    <td scope="col">[[p.pharmacy.name + " " + p.pharmacy.address + " " + p.pharmacy.city + ", " + p.pharmacy.state + " " + p.pharmacy.zip]]</td>
+    <td scope="col">
+        <button class="col-md-12 btn btn-success" ng-click="edit_prescription(p)">Edit</button>
+        <button class="col-md-12 btn btn-danger" ng-click="delete_prescription(p)">Delete</button>
+    </td>
+</script>
+{% endblock %}
+
+<!-- table in edit mode -->
+{% block table_edit %}
+<script type="text/ng-template" id="edit">
+    <td scope="col">
+        <select class="form-control" ng-model="selectedPrescription.drug" ng-options="d as (d.name + ' (' + d.type + ')') for d in drugs track by d.id"></select>
+    </td>
+    <td scope="col">
+        <input type="number" min="1" ng-model="selectedPrescription.dosage" class="form-control" size="5"/>
+    </td>
+    <td scope="col" class="row">
+        <div class="col">
+            <input type="date" ng-model="selectedPrescription.start_date"/>
+        </div>
+        <div class="col">
+            <input type="date" ng-model="selectedPrescription.end_date"/>
+        </div>
+    </td>
+    <td scope="col" class="row">
+        <div class="col">
+            <input type="number" min="0" ng-model="selectedPrescription.renewals" class="form-control" size="3"/>
+        </div>
+    </td>
+    <td scope="col">
+        <select class="form-control" ng-model="selectedPrescription.patient" ng-options="pat as (pat.first_name + ' ' + pat.last_name + ' (' + pat.user.username + ')') for pat in patients track by pat.user_id" ></select>
+    </td>
+    <td scope="col">
+        <select class="form-control" ng-model="selectedPrescription.pharmacy" ng-options="pharm as (pharm.name + ' ' + pharm.address + ' ' + pharm.city + ', ' + pharm.state + ' ' + pharm.zip) for pharm in pharmacies track by pharm.id"></select>
+    </td>
+    <td scope="col">
+        <button class="col-md-12 btn btn-success" ng-click="save_prescription()">Save</button>
+        <button class="col-md-12 btn btn-danger" ng-click="reset_edit()">Cancel</button>
+    </td>
+</script>
+{% endblock %}
+
+<!-- create new prescription heading -->
+{% set create_heading = 'Add a Prescription' %}
+
+<!-- create a new prescription form -->
+{% block create_form %}
+<form
+    class="form"
+    role="form"
+    name="add_prescription_form"
+    ng-submit="add_prescription(add_prescription_form.$valid)"
+>
+    <!-- drug, dosage, start date, end date -->
+    <div class="form-row">
+        <div class="form-group col-md-3">
+            <label for="prescription_drug">Drug</label>
+            <select
+                class="form-control"
+                name="prescription_drug"
+                ng-model="prescription.drug"
+                ng-options="d as (d.name + ' (' + d.type + ')') for d in drugs track by d.id"
+                required
+            >
+                <option value="">Select One</option>
+            </select>
+        </div>
+        <div class="form-group col-md-3">
+            <label for="prescription_dosage">Dosage</label>
+            <input
+                type="number"
+                min="1"
+                ng-model="prescription.dosage"
+                class="form-control"
+                required
+            />
+        </div>
+        <div class="form-group col-md-3">
+            <label for="prescription_start_date">Start Date</label>
+            <input
+                type="date"
+                class="form-control"
+                name="prescription_start_date"
+                ng-model="prescription.start_date"
+                required
+            />
+        </div>
+        <div class="form-group col-md-3">
+            <label for="prescription_end_date">End Date</label>
+            <input
+                type="date"
+                class="form-control"
+                name="prescription_end_date"
+                ng-model="prescription.end_date"
+                required
+            />
+        </div>
+    </div>
+    <!-- renewals, patient, pharmacy -->
+    <div class="form-row">
+        <div class="form-group col-md-3">
+            <label for="prescription_renewals">Renewals</label>
+            <input
+                type="number"
+                name="prescription_renewals"
+                min="0"
+                ng-model="prescription.renewals"
+                class="form-control"
+                required
+            />
+        </div>
+        <div class="form-group col-md-4">
+            <label for="prescription_patient">Patient</label>
+            <select
+                class="form-control"
+                name="prescription_patient"
+                ng-model="prescription.patient"
+                ng-options="pat as (pat.first_name + ' ' + pat.last_name + ' (' + pat.user.username + ')') for pat in patients track by pat.user.id"
+                required
+            >
+                <option value="">Select One</option>
+            </select>
+        </div>
+        <div class="form-group col-md-5">
+            <label for="prescription_pharmacy">Pharmacy</label>
+            <select
+                class="form-control"
+                name="prescription_pharmacy"
+                ng-model="prescription.pharmacy"
+                ng-options="pharm as (pharm.name + ' ' + pharm.address + ' ' + pharm.city + ', ' + pharm.state + ' ' + pharm.zip) for pharm in pharmacies track by pharm.id"
+                required
+            >
+                <option value="">Select One</option>
+            </select>
+        </div>
+    </div>
+    <!-- submit button -->
+    <div class="row">
+        <div class="col-md-12 text-right">
+            <!-- prettier-ignore -->
+            <button type="submit" class="btn btn-success" name="submit">Submit</button>
+        </div>
+    </div>
+</form>
+{% endblock %}
