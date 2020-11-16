@@ -71,8 +71,10 @@ class Prescription(db.Model):
     dosage = db.Column(db.Integer, nullable=False)
     renewals = db.Column(db.Integer, nullable=False)
 
-    pharmacy_id = db.Column(db.Integer, db.ForeignKey("pharmacy.id"), nullable=True)
-    pharmacy = db.relationship(Pharmacy, backref="prescriptions")
+    pharmacy_id = db.Column(db.Integer, db.ForeignKey("pharmacy.id"), nullable=False)
+    pharmacy = db.relationship(
+        Pharmacy, backref=db.backref("prescriptions", cascade="all, delete-orphan")
+    )
 
     start_date = db.Column(db.DateTime, nullable=False)
     end_date = db.Column(db.DateTime, nullable=False)
@@ -123,7 +125,7 @@ class Prescription(db.Model):
         return renewals
 
     @validates("start_date", "end_date")
-    def validate_end_date(self, key, date: datetime) -> datetime:
+    def validate_dates(self, key, date: datetime) -> datetime:
         """
         Validates that the start/end date is after the start date and after today.
 
@@ -133,15 +135,14 @@ class Prescription(db.Model):
         :raises AssertionError: if end date is before the current date
         """
 
-        if key == "start_date":
-            return date
-        else:
+        if key == "start_date" and self.end_date is not None:
+            if date > self.end_date:
+                raise AssertionError("Start date must be before end date")
+        elif self.start_date is not None:
             if date < self.start_date:
                 raise AssertionError("End date must be after start date")
-            if date < datetime.today():
-                raise AssertionError("End date must be on or after the current date.")
 
-            return date
+        return date
 
 
 class PrescriptionSchema(ma.SQLAlchemyAutoSchema):
@@ -155,11 +156,11 @@ class PrescriptionSchema(ma.SQLAlchemyAutoSchema):
 
     patient = ma.Nested("PatientSchema")
     prescriber = ma.Nested("PersonnelSchema")
-    pharmacy = ma.Nested("PharmacySchema", allow_none=True)
     drug = ma.Nested("DrugSchema")
+    pharmacy = ma.Nested("PharmacySchema")
 
-    start_date = fields.Date(format="%m/%d/%Y")
-    end_date = fields.Date(format="%m/%d/%Y")
+    start_date = fields.DateTime(format="%m/%d/%Y")
+    end_date = fields.DateTime(format="%m/%d/%Y")
 
     @post_load
     def make_prescription(self, data: dict, **kwargs) -> Prescription:
