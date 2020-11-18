@@ -16,29 +16,34 @@
         <!-- AngularJS import -->
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
         <!-- AngularJS code -->
-        <script src="{{'/static/js/' + angular_path}}"></script>
+        <script src="{% if angular_path %}{{'/static/js/' + angular_path}}{% endif %}"></script>
     </head>
-    <body ng-app="{{angular_app}}" ng-controller="{{angular_controller}}">
-        <nav class="navbar navbar-inverse">
-            <div class="container-fluid">
+    <!-- prettier-ignore -->
+    <body
+        {% if angular_app %}ng-app="{{angular_app}}"{% endif %}
+        {% if angular_controller %}ng-controller="{{angular_controller}}"{% endif %}
+    >
+        <nav class="navbar navbar-expand-lg navbar-inverse bg-dark fixed-top">
+            <div class="container">
                 <a class="navbar-brand" href="/">PyTrust</a>
                 <ul class="nav navbar-nav">
-                    <li>
-                        <a href="https://github.com/wmboyles/PyTrust"
-                            >View Source</a
-                        >
-                    </li>
+                    <!-- TODO: Put in role-based stuff -->
+                    {% if session.role == 'admin' %}
+                    <li><a href="#">ADMIN</a></li>
+                    {% elif session.role == 'pharmacist' %}
+                    <li><a href="#">PHARMACIST</a></li>
+                    {% elif session.role == 'patient' %}
+                    <li><a href="#">PATIENT</a></li>
+                    {% elif session.role == 'hcp' %}
+                    <li><a href="#">HCP</a></li>
+                    {% endif %}
+                    <li><a href="https://github.com/wmboyles/PyTrust">View Source</a></li>
                 </ul>
-                <form
-                    class="navbar-form navbar-right"
-                    action="/logout"
-                    method="GET"
-                >
-                    <button type="submit" class="btn btn-danger">
-                        Log Out
-                    </button>
+                
+                <form class="navbar-form navbar-right" action="/logout" method="GET">
+                    <button type="submit" class="btn btn-danger">Log Out</button>
                 </form>
-                <p class="navbar-text pull-right">{{session.username}}</p>
+                <div class="navbar-text pull-right">{{session.username}}</div>
             </div>
         </nav>
         <div class="container">
