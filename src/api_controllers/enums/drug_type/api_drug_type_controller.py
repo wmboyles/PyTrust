@@ -7,8 +7,8 @@ This file contains API methods that relate to drug types
 from flask import Blueprint, jsonify
 from http import HTTPStatus
 
-from ....models.enums.drug_type.drug_type import DrugType
-from ....decorators import has_roles
+from src.models.enums.drug_type.drug_type import DrugType
+from src.decorators import has_roles
 
 api_drug_type_controller = Blueprint(
     "api_drug_type_controller",

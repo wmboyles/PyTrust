@@ -7,7 +7,7 @@ This file contains API methods that relate to ethnicity.
 from flask import Blueprint, jsonify
 from http import HTTPStatus
 
-from ....models.enums.ethnicity.ethnicity import Ethnicity
+from src.models.enums.ethnicity.ethnicity import Ethnicity
 
 api_ethnicity_controller = Blueprint(
     "api_ethnicity_controller",

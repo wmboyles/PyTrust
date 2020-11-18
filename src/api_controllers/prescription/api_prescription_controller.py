@@ -9,15 +9,15 @@ from flask import Blueprint, jsonify, request, session
 from http import HTTPStatus
 from marshmallow.exceptions import ValidationError
 
-from ...models.persistent.persistent import db
-from ...models.persistent.prescription.prescription import (
+from src.models.persistent.persistent import db
+from src.models.persistent.prescription.prescription import (
     Prescription,
     PrescriptionSchema,
 )
-from ...models.persistent.user.user import User, UserRole
-from ...models.persistent.user.personnel.personnel import Personnel
-from ...models.persistent.user.patient.patient import Patient
-from ...decorators import has_roles
+from src.models.persistent.user.user import User, UserRole
+from src.models.persistent.user.personnel.personnel import Personnel
+from src.models.persistent.user.patient.patient import Patient
+from src.decorators import has_roles
 
 api_prescription_controller = Blueprint(
     "api_prescription_controller",

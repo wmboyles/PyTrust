@@ -9,11 +9,11 @@ from flask import Blueprint, jsonify, request, session
 from http import HTTPStatus
 from marshmallow.exceptions import ValidationError
 
-from ....models.persistent.persistent import db
-from ....models.persistent.user.personnel.personnel import Personnel, PersonnelSchema
-from ....models.persistent.user.user import User, UserSchema
-from ....models.enums.user_role.user_role import UserRole
-from ....decorators import has_roles
+from src.models.persistent.persistent import db
+from src.models.persistent.user.personnel.personnel import Personnel, PersonnelSchema
+from src.models.persistent.user.user import User, UserSchema
+from src.models.enums.user_role.user_role import UserRole
+from src.decorators import has_roles
 
 api_personnel_controller = Blueprint(
     "api_personnel_controller",

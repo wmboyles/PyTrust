@@ -7,8 +7,8 @@ This file contains API methods that relate to user roles
 from flask import Blueprint, jsonify
 from http import HTTPStatus
 
-from ....models.enums.user_role.user_role import UserRole
-from ....decorators import has_roles
+from src.models.enums.user_role.user_role import UserRole
+from src.decorators import has_roles
 
 api_user_role_controller = Blueprint(
     "api_user_role_controller",

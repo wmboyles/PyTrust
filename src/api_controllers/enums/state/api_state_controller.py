@@ -7,7 +7,7 @@ This file contains API methods that relate to states.
 from flask import Blueprint, jsonify
 from http import HTTPStatus
 
-from ....models.enums.state.state import State
+from src.models.enums.state.state import State
 
 api_state_controller = Blueprint(
     "api_state_controller",

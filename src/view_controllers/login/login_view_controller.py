@@ -7,7 +7,7 @@ This file contains routes for the pages related to logging in.
 from flask import Blueprint, render_template, request, redirect, session
 
 # Most view classes shouldn't work so directly with persistence classes
-from ...models.persistent.user.user import User
+from src.models.persistent.user.user import User
 
 login_view_controller = Blueprint(
     "login_view_controller",

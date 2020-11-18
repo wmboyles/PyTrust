@@ -7,7 +7,7 @@ This file contians API methods that relate to gender
 from flask import Blueprint, jsonify
 from http import HTTPStatus
 
-from ....models.enums.gender.gender import Gender
+from src.models.enums.gender.gender import Gender
 
 api_gender_controller = Blueprint(
     "api_gender_controller",

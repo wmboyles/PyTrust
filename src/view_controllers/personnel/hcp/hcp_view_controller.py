@@ -6,7 +6,7 @@ This file contains routes for the pages a hcp can see.
 
 from flask import Blueprint, render_template, redirect
 
-from ....decorators import has_roles
+from src.decorators import has_roles
 
 hcp_view_controller = Blueprint(
     "hcp_view_controller",

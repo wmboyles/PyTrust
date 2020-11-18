@@ -6,7 +6,7 @@ This file contains routes for the pages a patient can see.
 
 from flask import Blueprint, render_template, redirect
 
-from ...decorators import has_roles
+from src.decorators import has_roles
 
 patient_view_controller = Blueprint(
     "patient_view_controller",

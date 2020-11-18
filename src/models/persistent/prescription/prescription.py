@@ -16,7 +16,7 @@ from ...persistent.user.patient.patient import Patient
 from ...persistent.institution.pharmacy.pharmacy import Pharmacy
 from ...persistent.user.personnel.personnel import Personnel
 from ...persistent.drug.drug import Drug
-from ....models.enums.user_role.user_role import UserRole
+from ...enums.user_role.user_role import UserRole
 
 
 class Prescription(db.Model):

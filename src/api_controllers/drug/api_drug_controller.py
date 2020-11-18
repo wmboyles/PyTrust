@@ -10,9 +10,9 @@ from http import HTTPStatus
 from marshmallow.exceptions import ValidationError
 from sqlalchemy.exc import IntegrityError
 
-from ...models.persistent.persistent import db
-from ...models.persistent.drug.drug import Drug, DrugSchema
-from ...decorators import has_roles
+from src.models.persistent.persistent import db
+from src.models.persistent.drug.drug import Drug, DrugSchema
+from src.decorators import has_roles
 
 # Controller blueprint that's exported to parent module to be registered
 api_drug_controller = Blueprint(
