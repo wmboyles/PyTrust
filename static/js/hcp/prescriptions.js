@@ -26,6 +26,7 @@ app.controller("managePrescriptionsCtrl", ($scope, $http, waitForLoadSelf) => {
         }
     };
 
+    // get list of all prescriptions this HCP has prescribed
     $scope.load_prescriptions = () => {
         $http.get("/api/prescriptions").then(
             (res) => {

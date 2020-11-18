@@ -17,9 +17,16 @@ pharmacist_view_controller = Blueprint(
 )
 
 BASE_FILE_URL = "personnel/pharmacist/"
+RETURN_IF_FAIL = redirect("/login")
 
 
 @pharmacist_view_controller.route("/")
-@has_roles(roles=["pharmacist"], return_if_fail=redirect("/login"))
+@has_roles(roles=["pharmacist"], return_if_fail=RETURN_IF_FAIL)
 def home():
     return render_template(BASE_FILE_URL + "index.html")
+
+
+@pharmacist_view_controller.route("/prescriptions")
+@has_roles(roles=["pharmacist"], return_if_fail=RETURN_IF_FAIL)
+def manage_prescriptions():
+    return render_template(BASE_FILE_URL + "prescriptions.html")

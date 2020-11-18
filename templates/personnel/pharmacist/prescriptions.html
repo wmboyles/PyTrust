@@ -1,0 +1,61 @@
+{% extends 'table_page.html' %}
+
+<!-- set title -->
+{% set title = 'Pharmacist | Manage Prescriptions' %}
+
+<!-- set angular path -->
+{% set angular_path = 'personnel/pharmacist/managePrescriptions.js' %}
+<!-- set angular app -->
+{% set angular_app = 'managePrescriptionsApp' %}
+<!-- set angular controller -->
+{% set angular_controller = 'managePrescriptionsCtrl' %}
+
+<!-- set page heading -->
+{% set page_heading = 'Pharmacist Manage Prescriptions' %}
+
+<!-- table template -->
+{% block table_template %}
+<table class="table table-bordered">
+    <caption>
+        Your Prescriptions
+    </caption>
+    <thead>
+        <tr scope="row">
+            <th scope="col">Drug (Type)</th>
+            <th scope="col">Dosage</th>
+            <th scope="col">Dates</th>
+            <th scope="col">Renewals</th>
+            <th scope="col">Prescriber</th>
+            <th scope="col">Patient</th>
+            <th scope="col">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="p in prescriptions" ng-include="get_template(d)"></tr>
+    </tbody>
+</table>
+{% endblock %}
+
+<!-- table view mode -->
+{% block table_view %}
+<script type="text/ng-template" id="view">
+       <td scope="col">[[p.drug.name + " (" + p.drug.type + ")"]]</td>
+       <td scope="col">[[p.dosage]]</td>
+       <td scope="col">[[p.start_date + " - " + p.end_date]]</td>
+       <td scope="col">[[p.renewals]]</td>
+       <td scope="col">[[p.prescriber.first_name + " " + p.prescriber.last_name]]</td>
+    <td scope="col">[[p.patient.first_name + " " + p.patient.last_name + " (" + p.patient.user.username + ")"]]</td>
+    <td scope="col">
+    	<button type="button" class="btn btn-success" ng-click="fill_prescription(p)">Fill</button>
+    </td>
+</script>
+{% endblock %}
+
+<!-- table edit mode -->
+{% block table_edit %} {% endblock %}
+
+<!-- create new heading -->
+{% set create_heading = '' %}
+
+<!-- create new form -->
+{% block create_form %} {% endblock %}
