@@ -126,3 +126,38 @@ def delete_prescription(id: int):
     db.session.commit()
 
     return "Successfully deleted prescription", HTTPStatus.OK
+
+
+@api_prescription_controller.route("/prescriptions/fill/<int:id>", methods=["PUT"])
+@has_roles(roles=["pharmacist"])
+def fill_prescription(id: int):
+    """
+    Fills a prescription with a given id. This decreases the number of renewals by 1.
+    If the prescription has used all its renewals so that it could ont be filled again, it will be deleted.
+
+    :param id: id of Prescription to fill
+    """
+
+    target_prescription = Prescription.query.get(id)
+    if target_prescription is None:
+        return "No prescription with that id", HTTPStatus.NOT_FOUND
+
+    calling_user = User.query.filter(User.username == session.get("username")).one()
+    calling_pharmacist = Personnel.query.get(calling_user.id)
+    if calling_pharmacist is None:
+        return "No personnel with calling username", HTTPStatus.NOT_FOUND
+
+    if target_prescription.pharmacy != calling_pharmacist.pharmacy:
+        return (
+            "Calling pharmacist does not work at prescription's pharmacy",
+            HTTPStatus.UNAUTHORIZED,
+        )
+
+    if target_prescription.renewals == 0:
+        db.session.delete(target_prescription)
+    else:
+        target_prescription.renewals -= 1
+
+    db.session.commit()
+
+    return "Successfully filled prescription", HTTPStatus.OK
