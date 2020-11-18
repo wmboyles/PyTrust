@@ -1,21 +1,23 @@
-<html>
-    <head>
-        <title>HCP Home</title>
-    </head>
-    <body>
-        <div>
-            <h1>Welcome to iTrust2 - HCP</h1>
+{% extends 'base.html' %}
 
-            <ul>
-                <li><a href="/logout">Log Out</a></li>
-                <li><a href="/personnel/demographics">Edit Demographics</a></li>
-                <li>
-                    <a href="/hcp/editpatientdemographics"
-                        >Edit Patient Demographics</a
-                    >
-                </li>
-                <li><a href="/hcp/prescriptions">Manage Prescriptions</a></li>
-            </ul>
-        </div>
-    </body>
-</html>
+<!-- set title -->
+{% set title = 'HCP | Home' %}
+
+<!-- set angular-path to nothing -->
+{% set angular_path = '' %}
+
+<!-- page content -->
+{% block content %}
+<div>
+    <h1>Welcome to iTrust2 - HCP</h1>
+
+    <ul>
+        <li><a href="/logout">Log Out</a></li>
+        <li><a href="/personnel/demographics">Edit Demographics</a></li>
+        <li>
+            <a href="/hcp/editpatientdemographics">Edit Patient Demographics</a>
+        </li>
+        <li><a href="/hcp/prescriptions">Manage Prescriptions</a></li>
+    </ul>
+</div>
+{% endblock %}

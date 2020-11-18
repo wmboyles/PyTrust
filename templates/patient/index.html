@@ -1,16 +1,20 @@
-<html>
-    <head>
-        <title>Patient Home</title>
-    </head>
-    <body>
-        <div>
-            <h1>Welcome to iTrust2 - Patient</h1>
+{% extends 'base.html' %}
 
-            <ul>
-                <li><a href="/logout">Log Out</a></li>
-                <li><a href="/patient/demographics">Edit Demographics</a></li>
-                <li><a href="/patient/prescriptions">View Prescriptions</a></li>
-            </ul>
-        </div>
-    </body>
-</html>
+<!-- set title -->
+{% set title = 'Patient | Home' %}
+
+<!-- set angular-path to nothing -->
+{% set angular_path = '' %}
+
+<!-- page content -->
+{% block content %}
+<div>
+    <h1>Welcome to iTrust2 - Patient</h1>
+
+    <ul>
+        <li><a href="/logout">Log Out</a></li>
+        <li><a href="/patient/demographics">Edit Demographics</a></li>
+        <li><a href="/patient/prescriptions">View Prescriptions</a></li>
+    </ul>
+</div>
+{% endblock %}

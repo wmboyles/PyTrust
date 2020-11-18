@@ -1,18 +1,22 @@
-<html>
-    <head>
-        <title>Admin Home</title>
-    </head>
-    <body>
-        <div>
-            <h1>Welcome to iTrust2 - Admin</h1>
+{% extends 'base.html' %}
 
-            <ul>
-                <li><a href="/logout">Log Out</a></li>
-                <li><a href="/admin/drugs">Manage Drugs</a></li>
-                <li><a href="/admin/users">Manage Users</a></li>
-                <li><a href="/admin/pharmacies">Manage Pharmacies</a></li>
-                <li><a href="/admin/hospitals">Manage Hospitals</a></li>
-            </ul>
-        </div>
-    </body>
-</html>
+<!-- set title -->
+{% set title = 'Admin | Home' %}
+
+<!-- set angular-path to nothing -->
+{% set angular_path = '' %}
+
+<!-- page content -->
+{% block content %}
+<div>
+    <h1>Welcome to iTrust2 - Admin</h1>
+
+    <ul>
+        <li><a href="/logout">Log Out</a></li>
+        <li><a href="/admin/drugs">Manage Drugs</a></li>
+        <li><a href="/admin/users">Manage Users</a></li>
+        <li><a href="/admin/pharmacies">Manage Pharmacies</a></li>
+        <li><a href="/admin/hospitals">Manage Hospitals</a></li>
+    </ul>
+</div>
+{% endblock %}
