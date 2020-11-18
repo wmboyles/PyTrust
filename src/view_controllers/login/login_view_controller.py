@@ -44,6 +44,10 @@ def login_home():
                 session["password_hash"] = db_user.password_hash
                 session["role"] = db_user.role.role_name
 
+                if session.get("refer_path") and "login" not in session.get(
+                    "refer_path"
+                ):
+                    return redirect(session.pop("refer_path"))
                 return redirect(db_user.role.landing_page)
 
     # If user already has a session, verify it matches a db user and log in
@@ -52,10 +56,20 @@ def login_home():
     if session_username and session_password:
         db_user = User.query.filter(User.username == session_username).first()
         if db_user.password_hash == session_password:
+            if session.get("refer_path") and "login" not in session.get("refer_path"):
+                return redirect(session.pop("refer_path"))
             return redirect(db_user.role.landing_page)
 
     # Otherwise, show login page
-    return render_template(BASE_FILE_URL + "login.html")
+    message = ""
+    if session.get("refer_path"):
+        message = "User's role not authorized. Log in as authorized role."
+    if request.method == "POST":
+        message = "Incorrect username or password"
+    return render_template(
+        BASE_FILE_URL + "login.html",
+        message=message,
+    )
 
 
 @login_view_controller.route("/logout", methods=["GET"])

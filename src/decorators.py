@@ -5,7 +5,7 @@ Contains function decorators used throughout the project.
 """
 
 from http import HTTPStatus
-from flask import session
+from flask import session, request
 from functools import wraps
 
 DEFAULT_RETURN_IF_FAIL = ("User not authorized", HTTPStatus.UNAUTHORIZED)
@@ -25,6 +25,11 @@ def has_roles(roles, return_if_fail=DEFAULT_RETURN_IF_FAIL):
             if session.get("role") in roles:
                 return func(*args, **kwargs)
             else:
+                session.pop("username", None)
+                session.pop("password_hash", None)
+                session.pop("role", None)
+                session["refer_path"] = request.path
+
                 return return_if_fail
 
         return func_wrapper
