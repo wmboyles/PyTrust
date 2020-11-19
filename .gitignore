@@ -4,6 +4,8 @@ __pycache__/
 # formatting / editor files
 .vscode/
 
+# test database file
+test_db.py
 
 # Files that could contain secrets
 .env
