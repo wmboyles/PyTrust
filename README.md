@@ -49,19 +49,19 @@ In the root directory of the project (where `app.py` is), create a new file call
 DB_USER = [DATABASE USERNAME]
 DB_PASS = [DATABASE PASSWORD]
 DB_NAME = [DATABASE SCHEMA NAME]
+TEST_DB_PATH = [FULL PATH TO .db FILE INCLUDING NAME]
 
 DEBUG = 1
-SQLALCHEMY_TRACK_MODIFICATIONS = 0
+REFRESH_DB = 1
 SECRET_KEY = [SOMETHING YOU'LL REMEMBER]
 ```
 
-You can set `DEBUG = 0` if you'd like, but it turns off some useful features for developing, like restarting the application when you save a file.
-<br>
-You can also set `SQLALCHEMY_TRACK_MODIFICATIONS = 1` if you'd like, but it's not that useful and may slow down the application.
+-   You can set `DEBUG = 0` if you'd like, but it turns off some useful features for developing, like restarting the application when you save a file.
+-   You can also set `REFRESH_DB = 0` if you'd like. This will mean that the database will remain in it's current state, and the data generator won't run.
 
 ### Running
 
-Once all these steps are completed, you should be able to run the application by doing `$ python app.py` or `$ flask serve`. You should see some output that looks something like this.
+Once all these steps are completed, you should be able to run the application by doing `$ python app.py` or `$ flask run`. You should see some output that looks something like this.
 
 ```
  * Serving Flask app "app" (lazy loading)
@@ -74,3 +74,51 @@ Once all these steps are completed, you should be able to run the application by
  * Debugger PIN: ###-###-###
  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
 ```
+
+### Testing
+
+Test files use a mock database.
+After each test method runs, any database changes are rolled back.
+This means that a test should either create all the database items it needs for its tests or be able to use what (if anything) is present in the database.
+
+#### File, Method Naming Conventions
+
+All test files are in the test directory.
+To be picked up correctly by the testing module, all test files and methods should be named following the pattern `test_*.py`.
+
+#### Running
+
+You can run the full suite of tests by running the command `$ pytest` in the root or test directory.
+If you want to run a subset of tests, you can append the paths to directories or test files you want like `$ pytest test/users/ test/drugs/test_drugs.py`.
+
+Note that the way pytest works is looking for properly named files and methods in the directory and files your provide.
+This means that if you wanted to store test files in the same directory as their corresponding source files, you could.
+
+#### Coverage
+
+By appending the argument `--cov=[MEASURE] [RUN]` to your pytest command, all tests in the `RUN` file/directory will run, measuring the coverage of everything in the `MEASURE` file/directory.
+This will tell you the number of lines covered, number of lines missed, and the coverage percentage of each file specified by `MEASURE`.
+It will also create a `.coverage` file, which can be used by some softwares.
+
+```
+Name                                                     Stmts   Miss  Cover
+----------------------------------------------------------------------------
+src\models\persistent\data_generator.py                    130    130     0%
+src\models\persistent\drug\drug.py                          32      3    91%
+src\models\persistent\institution\hospital\hospital.py      16      1    94%
+src\models\persistent\institution\instutitution.py          16      3    81%
+src\models\persistent\institution\pharmacy\pharmacy.py      16      1    94%
+src\models\persistent\persistent.py                         11      0   100%
+src\models\persistent\prescription\prescription.py          60     17    72%
+src\models\persistent\user\patient\patient.py               53      7    87%
+src\models\persistent\user\personnel\personnel.py           43      9    79%
+src\models\persistent\user\user.py                          28      9    68%
+----------------------------------------------------------------------------
+TOTAL                                                      405    180    56%
+```
+
+If you want to know exactly what line numbers you missed, you can append the argument `--cov-report term-missing`.
+However, a more persistent and user-friendly option is to instead append the arugment `--cov-report html`, which will generate an HTML version of the coverage report in a folder called `htmlcov`.
+Opening up the `index.html` file in this folder will give an output similar to what you'd see on the terminal, but you can click on any entry to visually see what lines were missed.
+
+**Note:** You might notice that you have higher than expected coverage, especially in modules you didn't explicitly test. This is due to things like import statements, variables in the scope of the entire module, and annotations running when the app starts. You should actually investigate if you have coverage on code.

@@ -7,5 +7,9 @@ __pycache__/
 # test database file
 test_db.py
 
+# coverage files
+.coverage
+htmlcov/
+
 # Files that could contain secrets
 .env

@@ -7,4 +7,5 @@ marshmallow-sqlalchemy==0.24.0
 pymysql==0.10.1
 pytest==6.1.1
 pytest-cov==2.10.1
+pytest-flask==1.1.0
 python-dotenv==0.15.0

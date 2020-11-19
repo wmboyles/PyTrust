@@ -13,6 +13,7 @@ TEST_DATABASE_URI = "sqlite:///" + TEST_DB_PATH
 @pytest.fixture(scope="session")
 def app(request):
     app = create_app()
+    app.secret_key = os.environ.get("SECRET_KEY")
     app.config["TESTING"] = True
     app.config["SQLALCHEMY_DATABASE_URI"] = TEST_DATABASE_URI
 
